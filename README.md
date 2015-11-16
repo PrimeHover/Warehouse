@@ -25,4 +25,5 @@ Warehouses for RPG Maker MV
 * Just install the plugin and turn it on.
 
 ### ChangeLog
+* 11/16/2015: Fixed issue that allowed items remain in the storage after initiating a new game.
 * 11/14/2015: Version 1.0

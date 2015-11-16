@@ -297,9 +297,9 @@ var PHWarehouse;
     /*
      * Creating PHWarehouse variable after loading the whole database
      */
-    var _DataManager_loadDatabase_ = DataManager.loadDatabase;
-    DataManager.loadDatabase = function() {
-        _DataManager_loadDatabase_.call(this);
+    var _DataManager_createGameObjects_ = DataManager.createGameObjects;
+    DataManager.createGameObjects = function() {
+        _DataManager_createGameObjects_.call(this);
         PHWarehouse = new PHWarehouseManager();
     };
 
