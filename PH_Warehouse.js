@@ -3,8 +3,8 @@
  PH - Warehouse/Storage
  @plugindesc This plugin allows the creation of warehouses where you can store items in the game.
  @author PrimeHover
- @version 1.0.0
- @date 11/14/2015
+ @version 1.1.0
+ @date 11/17/2015
 
  ---------------------------------------------------------------------------------------
  This work is licensed under the Creative Commons Attribution 4.0 International License.
@@ -29,30 +29,85 @@
 
  @help
 
+ Warehouse/Storage Plugin
+ created by PrimeHover
+
+ Check out the full documentation at: https://github.com/PrimeHover/Warehouse
+ Check out an illustrative example of using the commands and rules at: http://forums.rpgmakerweb.com/index.php?/topic/50503-ph-warehousestorage/
+ Check out the portuguese example at: http://www.mundorpgmaker.com.br/topic/114053-ph-warehousestorage/
+
+ ----------------------------------------------------------------------------------------------------------------------------------
+
  Plugin Commands:
 
- - PHWarehouse create <Title of the Warehouse:50>               # Creates a warehouse with 50 spaces if it does not exist
- - PHWarehouse show <Title of the Warehouse>                    # Shows a warehouse
- - PHWarehouse remove <Title of the Warehouse>                  # Removes a warehouse
+ - PHWarehouse create <Title of the Warehouse                       # Creates a warehouse
+ - PHWarehouse create <Title of the Warehouse:50>                   # Creates a warehouse and sets its maximum capacity to 50
+ - PHWarehouse create <Title of the Warehouse:50:rule>              # Creates a warehouse, sets its maximum capacity to 50 and sets a rule
 
- The first command creates and opens a warehouse with the given title.
- If it already exists, the command will be ignored.
- Substitute "50" for the maximum number of spaces that the warehouse will have.
- If you leave the number in blank, the default size will be 50.
- Sizes cannot be changed.
+ - PHWarehouse show <Title of the Warehouse>                        # Shows a warehouse
+ - PHWarehouse remove <Title of the Warehouse>                      # Removes a warehouse
 
- The second command opens the warehouse in the screen.
+ - PHWarehouse loot item <Title of the Warehouse:id:quantity>       # Add an item for loot bonus inside a created warehouse
+ - PHWarehouse loot weapon <Title of the Warehouse:id:quantity>     # Add a weapon for loot bonus inside a created warehouse
+ - PHWarehouse loot armor <Title of the Warehouse:id:quantity>      # Add an armor for loot bonus inside a created warehouse
+ - PHWarehouse loot keyItem <Title of the Warehouse:id:quantity>    # Add a key item for loot bonus inside a created warehouse
 
- The third command deletes an existent warehouse.
- Any remaining item in that specific warehouse will be removed as well.
+ - PHWarehouse add item <Title of the Warehouse:id:quantity>        # Add an item immediately inside a created warehouse
+ - PHWarehouse add weapon <Title of the Warehouse:id:quantity>      # Add a weapon immediately inside a created warehouse
+ - PHWarehouse add armor <Title of the Warehouse:id:quantity>       # Add an armor immediately inside a created warehouse
+ - PHWarehouse add keyItem <Title of the Warehouse:id:quantity>     # Add a key item immediately inside a created warehouse
 
- ========================================
+----------------------------------------------------------------------------------------------------------------------------------
 
- Script Calls: Use the commands below as a script command in a variable or conditional statement.
+Script Commands:
 
- - PHWarehouse.getMaxCapacity("Title of the Warehouse");        # Gets the maximum capacity of a warehouse (returns a number)
- - PHWarehouse.getCurrentCapacity("Title of the Warehouse");    # Gets the current capacity of a warehouse (returns a number)
- - PHWarehouse.exist("Title of the Warehouse");                 # Checks if a warehouse exists (returns true or false)
+ - PHWarehouse.prototype.exist("Title of the Warehouse");                   # Verifies if a warehouse exists
+
+ - PHWarehouse.prototype.getMaxCapacity("Title of the Warehouse");          # Gets the maximum capacity of a warehouse
+ - PHWarehouse.prototype.getCurrentCapacity("Title of the Warehouse");      # Gets the current capacity of a warehouse
+
+ - PHWarehouse.prototype.hasItem("Title of the Warehouse", id);             # Verifies if a warehouse has a particular item and returns the quantity of this item inside the warehouse
+ - PHWarehouse.prototype.hasWeapon("Title of the Warehouse", id);           # Verifies if a warehouse has a particular weapon and returns the quantity of this item inside the warehouse
+ - PHWarehouse.prototype.hasArmor("Title of the Warehouse", id);            # Verifies if a warehouse has a particular armor and returns the quantity of this item inside the warehouse
+ - PHWarehouse.prototype.hasKeyItem("Title of the Warehouse", id);          # Verifies if a warehouse has a particular key item and returns the quantity of this item inside the warehouse
+
+ ----------------------------------------------------------------------------------------------------------------------------------
+
+Rule Commands:
+
+Rules are a simple way to manage which items you can store in a specific warehouse.
+In order to create a rule for your warehouse, you have to create a Common Event in the database called "PHWarehouse".
+Inside of that Common Event, you will create some comments in order to populate the rules for warehouses.
+These comments must have one of the following formats:
+
+{Title of the Rule}
+[commands]
+
+The [commands] you can specify are as follow:
+
+item: 1 (Just allow the storage of the item with id 1)
+item: 1, 2, 3, 4 (Allows the storage of items with id 1, 2, 3 and 4)
+item: no (Does not allow the storage of items)
+item-n: 1 (Allows the storage of any item except the one with id 1)
+(If you don't specify the command "item" in the rule, all items will be allowed to be stored)
+
+weapon: 1 (Just allow the storage of the weapon with id 1)
+weapon: 1, 2, 3, 4 (Allows the storage of weapons with id 1, 2, 3 and 4)
+weapon: no (Does not allow the storage of weapons)
+weapon-n: 1 (Allows the storage of any weapon except the one with id 1)
+(If you don't specify the command "weapon" in the rule, all weapons will be allowed to be stored)
+
+armor: 1 (Just allow the storage of the armor with id 1)
+armor: 1, 2, 3, 4 (Allows the storage of armors with id 1, 2, 3 and 4)
+armor: no (Does not allow the storage of armors)
+armor-n: 1 (Allows the storage of any armor except the one with id 1)
+(If you don't specify the command "armor" in the rule, all armors will be allowed to be stored)
+
+keyItem: 1 (Just allow the storage of the key item with id 1)
+keyItem: 1, 2, 3, 4 (Allows the storage of key items with id 1, 2, 3 and 4)
+keyItem: no (Does not allow the storage of key items)
+keyItem-n: 1 (Allows the storage of any key item except the one with id 1)
+(If you don't specify the command "keyItem" in the rule, all key items will be allowed to be stored)
 
  */
 
@@ -72,11 +127,14 @@ var PHWarehouse;
      * ---------------------------------------------------------- */
 
     function PHWarehouseManager() {
+        this._rules = {};
         this._warehouses = {};
         this._lastActive = "";
         this._lastOption = 0; // 0 = Withdraw, 1 = Deposit
         this._lastCategory = "item";
     }
+
+    /* ---- BASIC OPERATIONS ---- */
 
     /* Creates a warehouse if it does not exist */
     PHWarehouseManager.prototype.createWarehouse = function(_sentence) {
@@ -84,18 +142,22 @@ var PHWarehouse;
         var matches = this.checkSentence(_sentence);
         var results;
         var title;
+        var rule = null;
         var capacity = 50;
 
         if (matches != null) {
-            results = matches[1].split(":");
+            results = matches.split(":");
             title = results[0];
 
             if (!this._warehouses.hasOwnProperty(title)) {
 
-                if (results.length == 2) {
+                if (results.length >= 2) {
                     capacity = parseInt(results[1]);
                     if (isNaN(capacity) || capacity <= 0) {
                         capacity = 50;
+                    }
+                    if (typeof results[2] !== "undefined" && this._rules.hasOwnProperty(results[2])) {
+                        rule = results[2];
                     }
                 }
 
@@ -103,6 +165,8 @@ var PHWarehouse;
                     title: title,
                     maxCapacity: capacity,
                     currentCapacity: 0,
+                    rule: rule,
+                    lootBonus: true,
                     items: {
                         item: [],
                         weapon: [],
@@ -127,9 +191,223 @@ var PHWarehouse;
     PHWarehouseManager.prototype.openWarehouse = function(_sentence) {
         var matches = this.checkSentence(_sentence);
         if (matches != null) {
-            this._lastActive = matches[1];
+            this._lastActive = matches;
+            this._warehouses[this._lastActive].lootBonus = false;
         }
     };
+
+    /* Remove a warehouse */
+    PHWarehouseManager.prototype.removeWarehouse = function(_sentence) {
+
+        var matches = this.checkSentence(_sentence);
+
+        if (matches != null) {
+            if (this._warehouses.hasOwnProperty(matches)) {
+                delete this._warehouses[matches];
+            }
+        }
+
+    };
+
+    /* Add a loot bonus */
+    PHWarehouseManager.prototype.addLoot = function(_sentence, category) {
+
+        var matches = this.checkSentence(_sentence);
+        var results;
+
+        if (matches != null) {
+            results = matches.split(":");
+            if (this._warehouses.hasOwnProperty(results[0]) && this._warehouses[results[0]].lootBonus && typeof results[1] !== "undefined" && typeof results[2] !== "undefined") {
+                results[1] = parseInt(results[1]);
+                results[2] = parseInt(results[2]);
+                if (results[2] > this._warehouses[results[0]].maxCapacity - this._warehouses[results[0]].currentCapacity) {
+                    results[2] = this._warehouses[results[0]].maxCapacity - this._warehouses[results[0]].currentCapacity;
+                }
+
+                if (this._warehouses[results[0]].items[category].indexOf(results[1]) > -1) {
+                    this._warehouses[results[0]].qtty[category][results[1]] += results[2];
+                } else {
+                    this._warehouses[results[0]].items[category].push(results[1]);
+                    this._warehouses[results[0]].qtty[category][results[1]] = results[2];
+                }
+                this._warehouses[results[0]].currentCapacity += results[2];
+            }
+        }
+
+    };
+
+    /* Add item to a warehouse */
+    PHWarehouseManager.prototype.addItems = function(_sentence, category) {
+
+        var matches = this.checkSentence(_sentence);
+        var results;
+
+        if (matches != null) {
+            results = matches.split(":");
+            if (this._warehouses.hasOwnProperty(results[0]) && typeof results[1] !== "undefined" && typeof results[2] !== "undefined") {
+                results[1] = parseInt(results[1]);
+                results[2] = parseInt(results[2]);
+
+                if (results[2] > this._warehouses[results[0]].maxCapacity - this._warehouses[results[0]].currentCapacity) {
+                    results[2] = this._warehouses[results[0]].maxCapacity - this._warehouses[results[0]].currentCapacity;
+                }
+
+                if (this._warehouses[results[0]].items[category].indexOf(results[1]) > -1) {
+                    this._warehouses[results[0]].qtty[category][results[1]] += results[2];
+                } else {
+                    this._warehouses[results[0]].items[category].push(results[1]);
+                    this._warehouses[results[0]].qtty[category][results[1]] = results[2];
+                }
+                this._warehouses[results[0]].currentCapacity += results[2];
+            }
+        }
+
+    };
+
+
+
+    /* ---- RULE METHODS ---- */
+
+    /* Load rules */
+    PHWarehouseManager.prototype.loadRules = function() {
+        var warehouseVar = null;
+
+        if ($dataCommonEvents) {
+            for (var i = 0; i < $dataCommonEvents.length; i++) {
+                if ($dataCommonEvents[i] instanceof Object && $dataCommonEvents[i].name == "PHWarehouse") {
+                    warehouseVar = $dataCommonEvents[i].list;
+                    i = $dataCommonEvents.length;
+                }
+            }
+        }
+
+        if (warehouseVar != null) {
+            this.populateRules(warehouseVar);
+        }
+    };
+
+    /* Populate rules */
+    PHWarehouseManager.prototype.populateRules = function(warehouseVar) {
+        var str = '';
+        var index = -1;
+        var rule;
+
+        for (var i = 0; i < warehouseVar.length; i++) {
+            if (warehouseVar[i].parameters[0]) {
+                str = warehouseVar[i].parameters[0].trim();
+                if (this.checkTitle(str)) {
+                    str = str.slice(1, str.length-1);
+                    this._rules[str] = {
+                        enabledItems: {
+                            item: [],
+                            weapon: [],
+                            armor: [],
+                            keyItem: []
+                        },
+                        disabledItems: {
+                            item: [],
+                            weapon: [],
+                            armor: [],
+                            keyItem: []
+                        }
+                    };
+                    index = str;
+                } else if (this._rules[index]) {
+                    rule = str.split(":");
+                    rule[0] = rule[0].trim();
+                    rule[1] = rule[1].trim();
+
+                    if (rule[0].indexOf('-n') > -1) {
+                        rule[0] = rule[0].replace("-n", "");
+                        if (this._rules[index].disabledItems.hasOwnProperty(rule[0])) {
+                            this._rules[index].disabledItems[rule[0]] = this.getItemsId(rule[1]);
+                        }
+                    } else {
+                        if (this._rules[index].enabledItems.hasOwnProperty(rule[0])) {
+                            if (rule[1].indexOf("no") > -1) {
+                                this._rules[index].enabledItems[rule[0]] = false;
+                            } else {
+                                this._rules[index].enabledItems[rule[0]] = this.getItemsId(rule[1]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    /* Checks if the string is a title or a description */
+    PHWarehouseManager.prototype.checkTitle = function(str) {
+        if (str.charAt(0) == "{" && str.charAt(str.length - 1) == "}") {
+            return true;
+        }
+        return false;
+    };
+
+    /* Separate ids and make it an array */
+    PHWarehouseManager.prototype.getItemsId = function(str) {
+        var arr = str.split(",");
+        for (var i = 0; i < arr; i++) {
+            arr[i] = parseInt(arr[i], 10);
+        }
+        return arr;
+    };
+
+    /* Checks if items are enabled */
+    PHWarehouseManager.prototype.isItemEnabled = function() {
+        if (this._warehouses[this._lastActive].rule == null || (this._rules.hasOwnProperty(this._warehouses[this._lastActive].rule) && Array.isArray(this._rules[this._warehouses[this._lastActive].rule].enabledItems.item))) {
+            return true;
+        }
+        return false;
+    };
+
+    /* Checks if weapons are enabled */
+    PHWarehouseManager.prototype.isWeaponEnabled = function() {
+        if (this._warehouses[this._lastActive].rule == null || (this._rules.hasOwnProperty(this._warehouses[this._lastActive].rule) && Array.isArray(this._rules[this._warehouses[this._lastActive].rule].enabledItems.weapon))) {
+            return true;
+        }
+        return false;
+    };
+
+    /* Checks if armors are enabled */
+    PHWarehouseManager.prototype.isArmorEnabled = function() {
+        if (this._warehouses[this._lastActive].rule == null || (this._rules.hasOwnProperty(this._warehouses[this._lastActive].rule) && Array.isArray(this._rules[this._warehouses[this._lastActive].rule].enabledItems.armor))) {
+            return true;
+        }
+        return false;
+    };
+
+    /* Checks if key items are enabled */
+    PHWarehouseManager.prototype.isKeyItemEnabled = function() {
+        if (this._warehouses[this._lastActive].rule == null || (this._rules.hasOwnProperty(this._warehouses[this._lastActive].rule) && Array.isArray(this._rules[this._warehouses[this._lastActive].rule].enabledItems.keyItem))) {
+            return true;
+        }
+        return false;
+    };
+
+    /* Verifies if an item is allowed to be withdrawn or deposited */
+    PHWarehouseManager.prototype.verifyItem = function(id) {
+        if (this._warehouses[this._lastActive].rule == null ||
+                (this._rules.hasOwnProperty(this._warehouses[this._lastActive].rule) &&
+                Array.isArray(this._rules[this._warehouses[this._lastActive].rule].enabledItems[this._lastCategory]) &&
+                    (this._rules[this._warehouses[this._lastActive].rule].enabledItems[this._lastCategory].indexOf(id) > -1) ||
+                    this._rules[this._warehouses[this._lastActive].rule].enabledItems[this._lastCategory].length == 0)) {
+
+            /* Makes a second checking to see if this item is disabled */
+            if (this._warehouses[this._lastActive].rule !== null &&
+                Array.isArray(this._rules[this._warehouses[this._lastActive].rule].disabledItems[this._lastCategory]) &&
+                this._rules[this._warehouses[this._lastActive].rule].disabledItems[this._lastCategory].indexOf(id) > -1) {
+                return false;
+            }
+
+            return true;
+        }
+        return false;
+    };
+
+
+
+    /* ---- MANAGEMENT METHODS ---- */
 
     /* Get all the items from the current warehouse */
     PHWarehouseManager.prototype.getItems = function() {
@@ -205,6 +483,10 @@ var PHWarehouse;
         return false;
     };
 
+
+
+    /* ---- OPERATION METHODS ---- */
+
     /* Deposit on warehouse */
     PHWarehouseManager.prototype.deposit = function(item) {
         if (this.checkCapacity()) {
@@ -245,26 +527,32 @@ var PHWarehouse;
 
     };
 
-    /* Remove a warehouse */
-    PHWarehouseManager.prototype.removeWarehouse = function(_sentence) {
 
-        var matches = this.checkSentence(_sentence);
 
-        if (matches != null) {
-            if (this._warehouses.hasOwnProperty(matches[1])) {
-                delete this._warehouses[matches[1]];
-            }
-        }
-
-    };
+    /* ---- INTERNAL METHODS ---- */
 
     /* Check sentences coming from the arguments */
     PHWarehouseManager.prototype.checkSentence = function(_sentence) {
         var regExp = /\<([^)]+)\>/;
-        return regExp.exec(_sentence);
+        var matches = regExp.exec(_sentence);
+        if (matches != null) {
+            return matches[1];
+        } else {
+            return null;
+        }
     };
 
-    /* ACCESSOR METHODS */
+    /* Main method for checking items inside warehouses */
+    PHWarehouseManager.prototype.hasItems = function(title, id, category) {
+        if (this._warehouses.hasOwnProperty(title) && this._warehouses[title].items[category].indexOf(id) > -1) {
+            return this._warehouses[title].qtty[category][id];
+        }
+        return 0;
+    };
+
+
+
+    /* ---- ACCESSOR METHODS ---- */
 
     /* Return the value of the maximum capacity of the warehouse for the given title */
     PHWarehouseManager.prototype.getMaxCapacity = function(title) {
@@ -274,7 +562,7 @@ var PHWarehouse;
         return 0;
     };
 
-    /* Return the value of the current capacity of the warehouse for the given title */
+    /* Return the value of the quantity of items in the warehouse for the given title */
     PHWarehouseManager.prototype.getCurrentCapacity = function(title) {
         if (this._warehouses.hasOwnProperty(title)) {
             return this._warehouses[title].currentCapacity;
@@ -290,17 +578,38 @@ var PHWarehouse;
         return false;
     };
 
+    /* Checks if the given warehouse has an item */
+    PHWarehouseManager.prototype.hasItem = function(title, id) {
+        return this.hasItems(title, id, 'item');
+    };
+
+    /* Checks if the given warehouse has a weapon */
+    PHWarehouseManager.prototype.hasWeapon = function(title, id) {
+        return this.hasItems(title, id, 'weapon');
+    };
+
+    /* Checks if the given warehouse has an armor */
+    PHWarehouseManager.prototype.hasArmor = function(title, id) {
+        return this.hasItems(title, id, 'armor');
+    };
+
+    /* Checks if the given warehouse has a key item */
+    PHWarehouseManager.prototype.hasKeyItem = function(title, id) {
+        return this.hasItems(title, id, 'keyItem');
+    };
+
+
+
     /* ---------------------------------------------------------- *
      *                      LOADING PROCESS                       *
      * ---------------------------------------------------------- */
 
-    /*
-     * Creating PHWarehouse variable after loading the whole database
-     */
+    /* Creating PHWarehouse variable after loading the whole database */
     var _DataManager_createGameObjects_ = DataManager.createGameObjects;
     DataManager.createGameObjects = function() {
         _DataManager_createGameObjects_.call(this);
         PHWarehouse = new PHWarehouseManager();
+        PHWarehouse.loadRules();
     };
 
     /* Saves the warehouses when the player saves the game */
@@ -317,11 +626,12 @@ var PHWarehouse;
         _DataManager_extractSaveContents_.call(this, contents);
         PHWarehouse = new PHWarehouseManager();
         PHWarehouse._warehouses = contents.phwarehouse;
+        PHWarehouse.loadRules();
     };
 
-    var getAllArguments = function(args) {
-        var str = args[1].toString();
-        for (var i = 2; i < args.length; i++) {
+    var getAllArguments = function(args, startIndex) {
+        var str = args[startIndex].toString();
+        for (var i = (startIndex+1); i < args.length; i++) {
             str += ' ' + args[i].toString();
         }
         return str;
@@ -333,18 +643,52 @@ var PHWarehouse;
         if (command === 'PHWarehouse') {
             switch (args[0]) {
                 case 'create':
-                    PHWarehouse.createWarehouse(getAllArguments(args));
+                    PHWarehouse.createWarehouse(getAllArguments(args, 1));
                     break;
                 case 'show':
-                    PHWarehouse.openWarehouse(getAllArguments(args));
+                    PHWarehouse.openWarehouse(getAllArguments(args, 1));
                     SceneManager.push(Scene_Warehouse);
                     break;
                 case 'remove':
-                    PHWarehouse.removeWarehouse(getAllArguments(args));
+                    PHWarehouse.removeWarehouse(getAllArguments(args, 1));
+                    break;
+                case 'add':
+                    switch (args[1]) {
+                        case 'item':
+                            PHWarehouse.addItems(getAllArguments(args, 2), 'item');
+                            break;
+                        case 'weapon':
+                            PHWarehouse.addItems(getAllArguments(args, 2), 'weapon');
+                            break;
+                        case 'armor':
+                            PHWarehouse.addItems(getAllArguments(args, 2), 'armor');
+                            break;
+                        case 'keyItem':
+                            PHWarehouse.addItems(getAllArguments(args, 2), 'keyItem');
+                            break;
+                    }
+                    break;
+                case 'loot':
+                    switch (args[1]) {
+                        case 'item':
+                            PHWarehouse.addLoot(getAllArguments(args, 2), 'item');
+                            break;
+                        case 'weapon':
+                            PHWarehouse.addLoot(getAllArguments(args, 2), 'weapon');
+                            break;
+                        case 'armor':
+                            PHWarehouse.addLoot(getAllArguments(args, 2), 'armor');
+                            break;
+                        case 'keyItem':
+                            PHWarehouse.addLoot(getAllArguments(args, 2), 'keyItem');
+                            break;
+                    }
                     break;
             }
         }
     };
+
+
 
     /* ---------------------------------------------------------- *
      *                       WINDOW PROCESS                       *
@@ -422,6 +766,38 @@ var PHWarehouse;
         PHWarehouse._lastCategory = this.currentSymbol() || "item";
     };
 
+    Window_WarehouseCategory.prototype.maxCols = function() {
+        var cols = 0;
+        if (PHWarehouse.isItemEnabled()) {
+            cols++;
+        }
+        if (PHWarehouse.isWeaponEnabled()) {
+            cols++;
+        }
+        if (PHWarehouse.isArmorEnabled()) {
+            cols++;
+        }
+        if (PHWarehouse.isKeyItemEnabled()) {
+            cols++;
+        }
+        return cols;
+    };
+
+    Window_WarehouseCategory.prototype.makeCommandList = function() {
+        if (PHWarehouse.isItemEnabled()) {
+            this.addCommand(TextManager.item, 'item');
+        }
+        if (PHWarehouse.isWeaponEnabled()) {
+            this.addCommand(TextManager.weapon, 'weapon');
+        }
+        if (PHWarehouse.isArmorEnabled()) {
+            this.addCommand(TextManager.armor, 'armor');
+        }
+        if (PHWarehouse.isKeyItemEnabled()) {
+            this.addCommand(TextManager.keyItem, 'keyItem');
+        }
+    };
+
     Window_WarehouseCategory.prototype.setItemWindow = function(itemWindow) {
         this._itemWindow = itemWindow;
         this.update();
@@ -488,12 +864,17 @@ var PHWarehouse;
             var numberWidth = this.numberWidth();
             var rect = this.itemRect(index);
             rect.width -= this.textPadding();
+
+            this.changePaintOpacity(PHWarehouse.verifyItem(item.id));
             this.drawItemName(item, rect.x, rect.y, rect.width - numberWidth);
+
             if (PHWarehouse._lastOption == 1) {
                 this.drawItemNumber(item, rect.x, rect.y, rect.width);
             } else if (PHWarehouse._lastOption == 0) {
                 this.drawWarehouseItemNumber(item, rect.x, rect.y, rect.width);
             }
+
+            this.changePaintOpacity(1);
         }
     };
 
@@ -517,21 +898,33 @@ var PHWarehouse;
 
     Window_WarehouseItemList.prototype.moveItem = function() {
 
+        var item = this.item();
+
         // Deposit
         if (PHWarehouse._lastOption == 1) {
-            if (PHWarehouse.checkCapacity()) {
-                PHWarehouse.deposit(this.item());
-                $gameParty.loseItem(this.item(), 1);
+            if (PHWarehouse.checkCapacity() && PHWarehouse.verifyItem(item.id)) {
+                SoundManager.playEquip();
+                PHWarehouse.deposit(item);
+                $gameParty.loseItem(item, 1);
+            } else {
+                SoundManager.playBuzzer();
             }
         }
 
         // Withdraw
         else if (PHWarehouse._lastOption == 0) {
-            PHWarehouse.withdraw(this.item());
-            $gameParty.gainItem(this.item(), 1);
+            if (PHWarehouse.verifyItem(item.id)) {
+                SoundManager.playEquip();
+                PHWarehouse.withdraw(item);
+                $gameParty.gainItem(item, 1);
+            } else {
+                SoundManager.playBuzzer();
+            }
         }
 
     };
+
+    Window_WarehouseItemList.prototype.playOkSound = function() { };
 
 
 
@@ -553,6 +946,7 @@ var PHWarehouse;
         this.changeTextColor(this.normalColor());
         this.drawText(this.availableSpaceText + this.availableSpaceValue, 0, 0, this.x);
     };
+
 
 
     /* ---------------------------------------------------------- *
@@ -639,7 +1033,6 @@ var PHWarehouse;
     };
 
     Scene_Warehouse.prototype.onItemOk = function() {
-        SoundManager.playEquip();
         this._itemWindow.moveItem();
         this._infoLocationWindow.refresh();
         this._itemWindow.activate();
