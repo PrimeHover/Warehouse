@@ -40,7 +40,7 @@
 
  Plugin Commands:
 
- - PHWarehouse create <Title of the Warehouse                       # Creates a warehouse
+ - PHWarehouse create <Title of the Warehouse>                      # Creates a warehouse
  - PHWarehouse create <Title of the Warehouse:50>                   # Creates a warehouse and sets its maximum capacity to 50
  - PHWarehouse create <Title of the Warehouse:50:rule>              # Creates a warehouse, sets its maximum capacity to 50 and sets a rule
 
