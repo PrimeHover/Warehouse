@@ -78,7 +78,7 @@ Rule Commands:
 Rules are a simple way to manage which items you can store in a specific warehouse.
 In order to create a rule for your warehouse, you have to create a Common Event in the database called "PHWarehouse".
 Inside of that Common Event, you will create some comments in order to populate the rules for warehouses.
-These comments must have one of the following formats:
+These comments must have the following format:
 
 {Title of the Rule}
 [commands]
