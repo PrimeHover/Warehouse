@@ -61,15 +61,15 @@
 
 Script Commands:
 
- - PHWarehouse.prototype.exist("Title of the Warehouse");                   # Verifies if a warehouse exists
+ - PHWarehouse.exist("Title of the Warehouse");                   # Verifies if a warehouse exists
 
- - PHWarehouse.prototype.getMaxCapacity("Title of the Warehouse");          # Gets the maximum capacity of a warehouse
- - PHWarehouse.prototype.getCurrentCapacity("Title of the Warehouse");      # Gets the current capacity of a warehouse
+ - PHWarehouse.getMaxCapacity("Title of the Warehouse");          # Gets the maximum capacity of a warehouse
+ - PHWarehouse.getCurrentCapacity("Title of the Warehouse");      # Gets the current capacity of a warehouse
 
- - PHWarehouse.prototype.hasItem("Title of the Warehouse", id);             # Verifies if a warehouse has a particular item and returns the quantity of this item inside the warehouse
- - PHWarehouse.prototype.hasWeapon("Title of the Warehouse", id);           # Verifies if a warehouse has a particular weapon and returns the quantity of this item inside the warehouse
- - PHWarehouse.prototype.hasArmor("Title of the Warehouse", id);            # Verifies if a warehouse has a particular armor and returns the quantity of this item inside the warehouse
- - PHWarehouse.prototype.hasKeyItem("Title of the Warehouse", id);          # Verifies if a warehouse has a particular key item and returns the quantity of this item inside the warehouse
+ - PHWarehouse.hasItem("Title of the Warehouse", id);             # Verifies if a warehouse has a particular item and returns the quantity of this item inside the warehouse
+ - PHWarehouse.hasWeapon("Title of the Warehouse", id);           # Verifies if a warehouse has a particular weapon and returns the quantity of this item inside the warehouse
+ - PHWarehouse.hasArmor("Title of the Warehouse", id);            # Verifies if a warehouse has a particular armor and returns the quantity of this item inside the warehouse
+ - PHWarehouse.hasKeyItem("Title of the Warehouse", id);          # Verifies if a warehouse has a particular key item and returns the quantity of this item inside the warehouse
 
  ----------------------------------------------------------------------------------------------------------------------------------
 
