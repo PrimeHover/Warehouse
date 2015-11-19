@@ -3,8 +3,8 @@
  PH - Warehouse/Storage
  @plugindesc This plugin allows the creation of warehouses where you can store items in the game.
  @author PrimeHover
- @version 1.1.0
- @date 11/17/2015
+ @version 1.1.1
+ @date 11/19/2015
 
  ---------------------------------------------------------------------------------------
  This work is licensed under the Creative Commons Attribution 4.0 International License.
@@ -61,15 +61,15 @@
 
 Script Commands:
 
- - PHWarehouse.exist("Title of the Warehouse");                   # Verifies if a warehouse exists
+ - PHPlugins.PHWarehouse.prototype.exist("Title of the Warehouse");                   # Verifies if a warehouse exists
 
- - PHWarehouse.getMaxCapacity("Title of the Warehouse");          # Gets the maximum capacity of a warehouse
- - PHWarehouse.getCurrentCapacity("Title of the Warehouse");      # Gets the current capacity of a warehouse
+ - PHPlugins.PHWarehouse.prototype.getMaxCapacity("Title of the Warehouse");          # Gets the maximum capacity of a warehouse
+ - PHPlugins.PHWarehouse.prototype.getCurrentCapacity("Title of the Warehouse");      # Gets the current capacity of a warehouse
 
- - PHWarehouse.hasItem("Title of the Warehouse", id);             # Verifies if a warehouse has a particular item and returns the quantity of this item inside the warehouse
- - PHWarehouse.hasWeapon("Title of the Warehouse", id);           # Verifies if a warehouse has a particular weapon and returns the quantity of this item inside the warehouse
- - PHWarehouse.hasArmor("Title of the Warehouse", id);            # Verifies if a warehouse has a particular armor and returns the quantity of this item inside the warehouse
- - PHWarehouse.hasKeyItem("Title of the Warehouse", id);          # Verifies if a warehouse has a particular key item and returns the quantity of this item inside the warehouse
+ - PHPlugins.PHWarehouse.prototype.hasItem("Title of the Warehouse", id);             # Verifies if a warehouse has a particular item and returns the quantity of this item inside the warehouse
+ - PHPlugins.PHWarehouse.prototype.hasWeapon("Title of the Warehouse", id);           # Verifies if a warehouse has a particular weapon and returns the quantity of this item inside the warehouse
+ - PHPlugins.PHWarehouse.prototype.hasArmor("Title of the Warehouse", id);            # Verifies if a warehouse has a particular armor and returns the quantity of this item inside the warehouse
+ - PHPlugins.PHWarehouse.prototype.hasKeyItem("Title of the Warehouse", id);          # Verifies if a warehouse has a particular key item and returns the quantity of this item inside the warehouse
 
  ----------------------------------------------------------------------------------------------------------------------------------
 
@@ -111,16 +111,20 @@ keyItem-n: 1 (Allows the storage of any key item except the one with id 1)
 
  */
 
-/* Global variable for management of the warehouses */
-var PHWarehouse;
+/* Global variable for PH Plugins */
+var PHPlugins = PHPlugins || {};
+PHPlugins.Parameters = PluginManager.parameters('PH_Warehouse');
+PHPlugins.Params = PHPlugins.Params || {};
+
+/* Global variable for the list of quests */
+PHPlugins.PHWarehouse = null;
+
+/* Getting the parameters */
+PHPlugins.PHWarehouseWithdrawText = String(PHPlugins.Parameters['Withdraw Text']);
+PHPlugins.PHWarehouseDepositText = String(PHPlugins.Parameters['Deposit Text']);
+PHPlugins.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available Space Text']);
 
 (function() {
-
-    /* Getting the parameters */
-    var parameters = PluginManager.parameters('PH_Warehouse');
-    var withdrawText = String(parameters['Withdraw Text']);
-    var depositText = String(parameters['Deposit Text']);
-    var availableSpaceText = String(parameters['Available Space Text']);
 
     /* ---------------------------------------------------------- *
      *                      WAREHOUSE MANAGER                     *
@@ -608,15 +612,15 @@ var PHWarehouse;
     var _DataManager_createGameObjects_ = DataManager.createGameObjects;
     DataManager.createGameObjects = function() {
         _DataManager_createGameObjects_.call(this);
-        PHWarehouse = new PHWarehouseManager();
-        PHWarehouse.loadRules();
+        PHPlugins.PHWarehouse = new PHWarehouseManager();
+        PHPlugins.PHWarehouse.loadRules();
     };
 
     /* Saves the warehouses when the player saves the game */
     var _DataManager_makeSaveContents_ = DataManager.makeSaveContents;
     DataManager.makeSaveContents = function() {
         var contents = _DataManager_makeSaveContents_.call(this);
-        contents.phwarehouse = PHWarehouse._warehouses;
+        contents.phwarehouse = PHPlugins.PHWarehouse._warehouses;
         return contents;
     };
 
@@ -624,9 +628,9 @@ var PHWarehouse;
     var _DataManager_extractSaveContents_ = DataManager.extractSaveContents;
     DataManager.extractSaveContents = function(contents) {
         _DataManager_extractSaveContents_.call(this, contents);
-        PHWarehouse = new PHWarehouseManager();
-        PHWarehouse._warehouses = contents.phwarehouse;
-        PHWarehouse.loadRules();
+        PHPlugins.PHWarehouse = new PHWarehouseManager();
+        PHPlugins.PHWarehouse._warehouses = contents.phwarehouse;
+        PHPlugins.PHWarehouse.loadRules();
     };
 
     var getAllArguments = function(args, startIndex) {
@@ -643,44 +647,44 @@ var PHWarehouse;
         if (command === 'PHWarehouse') {
             switch (args[0]) {
                 case 'create':
-                    PHWarehouse.createWarehouse(getAllArguments(args, 1));
+                    PHPlugins.PHWarehouse.createWarehouse(getAllArguments(args, 1));
                     break;
                 case 'show':
-                    PHWarehouse.openWarehouse(getAllArguments(args, 1));
+                    PHPlugins.PHWarehouse.openWarehouse(getAllArguments(args, 1));
                     SceneManager.push(Scene_Warehouse);
                     break;
                 case 'remove':
-                    PHWarehouse.removeWarehouse(getAllArguments(args, 1));
+                    PHPlugins.PHWarehouse.removeWarehouse(getAllArguments(args, 1));
                     break;
                 case 'add':
                     switch (args[1]) {
                         case 'item':
-                            PHWarehouse.addItems(getAllArguments(args, 2), 'item');
+                            PHPlugins.PHWarehouse.addItems(getAllArguments(args, 2), 'item');
                             break;
                         case 'weapon':
-                            PHWarehouse.addItems(getAllArguments(args, 2), 'weapon');
+                            PHPlugins.PHWarehouse.addItems(getAllArguments(args, 2), 'weapon');
                             break;
                         case 'armor':
-                            PHWarehouse.addItems(getAllArguments(args, 2), 'armor');
+                            PHPlugins.PHWarehouse.addItems(getAllArguments(args, 2), 'armor');
                             break;
                         case 'keyItem':
-                            PHWarehouse.addItems(getAllArguments(args, 2), 'keyItem');
+                            PHPlugins.PHWarehouse.addItems(getAllArguments(args, 2), 'keyItem');
                             break;
                     }
                     break;
                 case 'loot':
                     switch (args[1]) {
                         case 'item':
-                            PHWarehouse.addLoot(getAllArguments(args, 2), 'item');
+                            PHPlugins.PHWarehouse.addLoot(getAllArguments(args, 2), 'item');
                             break;
                         case 'weapon':
-                            PHWarehouse.addLoot(getAllArguments(args, 2), 'weapon');
+                            PHPlugins.PHWarehouse.addLoot(getAllArguments(args, 2), 'weapon');
                             break;
                         case 'armor':
-                            PHWarehouse.addLoot(getAllArguments(args, 2), 'armor');
+                            PHPlugins.PHWarehouse.addLoot(getAllArguments(args, 2), 'armor');
                             break;
                         case 'keyItem':
-                            PHWarehouse.addLoot(getAllArguments(args, 2), 'keyItem');
+                            PHPlugins.PHWarehouse.addLoot(getAllArguments(args, 2), 'keyItem');
                             break;
                     }
                     break;
@@ -708,7 +712,7 @@ var PHWarehouse;
     Window_WarehouseTitle.prototype.refresh = function() {
         this.contents.clear();
         this.changeTextColor(this.crisisColor());
-        this.drawText(PHWarehouse._lastActive, 0, 0, Graphics.boxWidth, "center");
+        this.drawText(PHPlugins.PHWarehouse._lastActive, 0, 0, Graphics.boxWidth, "center");
     };
 
 
@@ -721,8 +725,8 @@ var PHWarehouse;
 
     Window_WarehouseOption.prototype.initialize = function() {
         Window_Selectable.prototype.initialize.call(this, 0, this.fittingHeight(1), Graphics.boxWidth, this.fittingHeight(1));
-        this.withdrawText = withdrawText;
-        this.depositText = depositText;
+        this.withdrawText = PHPlugins.PHWarehouseWithdrawText;
+        this.depositText = PHPlugins.PHWarehouseDepositText;
         this.refresh();
         this.select(0);
         this.activate();
@@ -737,7 +741,7 @@ var PHWarehouse;
     };
 
     Window_WarehouseOption.prototype.changeOption = function() {
-        PHWarehouse._lastOption = this._index;
+        PHPlugins.PHWarehouse._lastOption = this._index;
     };
 
     Window_WarehouseOption.prototype.refresh = function() {
@@ -763,37 +767,37 @@ var PHWarehouse;
     };
 
     Window_WarehouseCategory.prototype.changeCategory = function() {
-        PHWarehouse._lastCategory = this.currentSymbol() || "item";
+        PHPlugins.PHWarehouse._lastCategory = this.currentSymbol() || "item";
     };
 
     Window_WarehouseCategory.prototype.maxCols = function() {
         var cols = 0;
-        if (PHWarehouse.isItemEnabled()) {
+        if (PHPlugins.PHWarehouse.isItemEnabled()) {
             cols++;
         }
-        if (PHWarehouse.isWeaponEnabled()) {
+        if (PHPlugins.PHWarehouse.isWeaponEnabled()) {
             cols++;
         }
-        if (PHWarehouse.isArmorEnabled()) {
+        if (PHPlugins.PHWarehouse.isArmorEnabled()) {
             cols++;
         }
-        if (PHWarehouse.isKeyItemEnabled()) {
+        if (PHPlugins.PHWarehouse.isKeyItemEnabled()) {
             cols++;
         }
         return cols;
     };
 
     Window_WarehouseCategory.prototype.makeCommandList = function() {
-        if (PHWarehouse.isItemEnabled()) {
+        if (PHPlugins.PHWarehouse.isItemEnabled()) {
             this.addCommand(TextManager.item, 'item');
         }
-        if (PHWarehouse.isWeaponEnabled()) {
+        if (PHPlugins.PHWarehouse.isWeaponEnabled()) {
             this.addCommand(TextManager.weapon, 'weapon');
         }
-        if (PHWarehouse.isArmorEnabled()) {
+        if (PHPlugins.PHWarehouse.isArmorEnabled()) {
             this.addCommand(TextManager.armor, 'armor');
         }
-        if (PHWarehouse.isKeyItemEnabled()) {
+        if (PHPlugins.PHWarehouse.isKeyItemEnabled()) {
             this.addCommand(TextManager.keyItem, 'keyItem');
         }
     };
@@ -823,9 +827,9 @@ var PHWarehouse;
 
     Window_WarehouseItemList.prototype.isCurrentItemEnabled = function() {
         if (this._data.length > 0) {
-            if (PHWarehouse._lastOption == 1 && PHWarehouse.checkCapacity()) {
+            if (PHPlugins.PHWarehouse._lastOption == 1 && PHPlugins.PHWarehouse.checkCapacity()) {
                 return true;
-            } else if (PHWarehouse._lastOption == 0) {
+            } else if (PHPlugins.PHWarehouse._lastOption == 0) {
                 return true;
             } else {
                 return false;
@@ -835,7 +839,7 @@ var PHWarehouse;
     };
 
     Window_WarehouseItemList.prototype.makeWarehouseItemList = function() {
-        var data = PHWarehouse.getItems();
+        var data = PHPlugins.PHWarehouse.getItems();
         this._data = data.filter(function(item) {
             return this.includes(item);
         }, this);
@@ -847,12 +851,12 @@ var PHWarehouse;
     Window_WarehouseItemList.prototype.loadItems = function() {
 
         // Deposit
-        if (PHWarehouse._lastOption == 1) {
+        if (PHPlugins.PHWarehouse._lastOption == 1) {
             this.makeItemList();
         }
 
         // Withdraw
-        else if (PHWarehouse._lastOption == 0) {
+        else if (PHPlugins.PHWarehouse._lastOption == 0) {
             this.makeWarehouseItemList();
         }
 
@@ -865,12 +869,12 @@ var PHWarehouse;
             var rect = this.itemRect(index);
             rect.width -= this.textPadding();
 
-            this.changePaintOpacity(PHWarehouse.verifyItem(item.id));
+            this.changePaintOpacity(PHPlugins.PHWarehouse.verifyItem(item.id));
             this.drawItemName(item, rect.x, rect.y, rect.width - numberWidth);
 
-            if (PHWarehouse._lastOption == 1) {
+            if (PHPlugins.PHWarehouse._lastOption == 1) {
                 this.drawItemNumber(item, rect.x, rect.y, rect.width);
-            } else if (PHWarehouse._lastOption == 0) {
+            } else if (PHPlugins.PHWarehouse._lastOption == 0) {
                 this.drawWarehouseItemNumber(item, rect.x, rect.y, rect.width);
             }
 
@@ -879,7 +883,7 @@ var PHWarehouse;
     };
 
     Window_WarehouseItemList.prototype.drawWarehouseItemNumber = function(item, x, y, width) {
-        var qtty = PHWarehouse.getQuantity(item);
+        var qtty = PHPlugins.PHWarehouse.getQuantity(item);
         if (typeof Yanfly !== "undefined") {
             this.contents.fontSize = Yanfly.Param.ItemQuantitySize;
             this.drawText('\u00d7' + qtty, x, y, width, 'right');
@@ -901,10 +905,10 @@ var PHWarehouse;
         var item = this.item();
 
         // Deposit
-        if (PHWarehouse._lastOption == 1) {
-            if (PHWarehouse.checkCapacity() && PHWarehouse.verifyItem(item.id)) {
+        if (PHPlugins.PHWarehouse._lastOption == 1) {
+            if (PHPlugins.PHWarehouse.checkCapacity() && PHPlugins.PHWarehouse.verifyItem(item.id)) {
                 SoundManager.playEquip();
-                PHWarehouse.deposit(item);
+                PHPlugins.PHWarehouse.deposit(item);
                 $gameParty.loseItem(item, 1);
             } else {
                 SoundManager.playBuzzer();
@@ -912,10 +916,10 @@ var PHWarehouse;
         }
 
         // Withdraw
-        else if (PHWarehouse._lastOption == 0) {
-            if (PHWarehouse.verifyItem(item.id)) {
+        else if (PHPlugins.PHWarehouse._lastOption == 0) {
+            if (PHPlugins.PHWarehouse.verifyItem(item.id)) {
                 SoundManager.playEquip();
-                PHWarehouse.withdraw(item);
+                PHPlugins.PHWarehouse.withdraw(item);
                 $gameParty.gainItem(item, 1);
             } else {
                 SoundManager.playBuzzer();
@@ -936,13 +940,13 @@ var PHWarehouse;
 
     Window_WarehouseInfo.prototype.initialize = function() {
         Window_Base.prototype.initialize.call(this, 0, Graphics.boxHeight - this.fittingHeight(1), Graphics.boxWidth, this.fittingHeight(1));
-        this.availableSpaceText = availableSpaceText + " ";
+        this.availableSpaceText = PHPlugins.PHWarehouseAvailableSpaceText + " ";
         this.refresh();
     };
 
     Window_WarehouseInfo.prototype.refresh = function() {
         this.contents.clear();
-        this.availableSpaceValue = (PHWarehouse._warehouses[PHWarehouse._lastActive].maxCapacity - PHWarehouse._warehouses[PHWarehouse._lastActive].currentCapacity) + " / " + PHWarehouse._warehouses[PHWarehouse._lastActive].maxCapacity;
+        this.availableSpaceValue = (PHPlugins.PHWarehouse._warehouses[PHPlugins.PHWarehouse._lastActive].maxCapacity - PHPlugins.PHWarehouse._warehouses[PHPlugins.PHWarehouse._lastActive].currentCapacity) + " / " + PHPlugins.PHWarehouse._warehouses[PHPlugins.PHWarehouse._lastActive].maxCapacity;
         this.changeTextColor(this.normalColor());
         this.drawText(this.availableSpaceText + this.availableSpaceValue, 0, 0, this.x);
     };

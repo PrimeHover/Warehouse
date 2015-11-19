@@ -42,7 +42,7 @@ In order to create a rule for your warehouse, you have to create a Common Event 
 Inside of that Common Event, you will create some comments in order to populate the rules for warehouses.
 These comments must have the following format:
 
-``{Title of the Rule}``    
+``{Title of the Rule}``
 ``[commands]``
 
 The ``[commands]`` you can specify are as follow:
