@@ -28,13 +28,13 @@ Warehouses for RPG Maker MV
 * ``PHWarehouse add keyItem <Title of the Warehouse:id:quantity>``: Add a key item immediately inside a created warehouse.
 
 ### Script Calls
-* ``PHWarehouse.getMaxCapacity("Title of the Warehouse")``: Gets the maximum capacity of a warehouse (returns a number).
-* ``PHWarehouse.getCurrentCapacity("Title of the Warehouse")``: Gets the current capacity of a warehouse (returns a number).
-* ``PHWarehouse.exist("Title of the Warehouse")``: Checks if a warehouse exists (returns true or false).
-* ``PHWarehouse.hasItem("Title of the Warehouse", id);``: Verifies if a warehouse has a particular item and returns the quantity of this item inside the warehouse.
-* ``PHWarehouse.hasWeapon("Title of the Warehouse", id);``: Verifies if a warehouse has a particular weapon and returns the quantity of this item inside the warehouse.
-* ``PHWarehouse.hasArmor("Title of the Warehouse", id);``: Verifies if a warehouse has a particular armor and returns the quantity of this item inside the warehouse.
-* ``PHWarehouse.hasKeyItem("Title of the Warehouse", id);``: Verifies if a warehouse has a particular key item and returns the quantity of this item inside the warehouse.
+* ``PHPlugins.PHWarehouse.getMaxCapacity("Title of the Warehouse")``: Gets the maximum capacity of a warehouse (returns a number).
+* ``PHPlugins.PHWarehouse.getCurrentCapacity("Title of the Warehouse")``: Gets the current capacity of a warehouse (returns a number).
+* ``PHPlugins.PHWarehouse.exist("Title of the Warehouse")``: Checks if a warehouse exists (returns true or false).
+* ``PHPlugins.PHWarehouse.hasItem("Title of the Warehouse", id);``: Verifies if a warehouse has a particular item and returns the quantity of this item inside the warehouse.
+* ``PHPlugins.PHWarehouse.hasWeapon("Title of the Warehouse", id);``: Verifies if a warehouse has a particular weapon and returns the quantity of this item inside the warehouse.
+* ``PHPlugins.PHWarehouse.hasArmor("Title of the Warehouse", id);``: Verifies if a warehouse has a particular armor and returns the quantity of this item inside the warehouse.
+* ``PHPlugins.PHWarehouse.hasKeyItem("Title of the Warehouse", id);``: Verifies if a warehouse has a particular key item and returns the quantity of this item inside the warehouse.
 
 ### Rule Configuration
 Rules are a simple way to manage which items you can store in a specific warehouse.
@@ -72,6 +72,7 @@ The ``[commands]`` you can specify are as follow:
 * (If you don't specify the command "keyItem" in the rule, all key items will be allowed to be stored)
 
 ### ChangeLog
+* 11/19/2015: Bug fixed in the global variable that receives the parameters. Also, a small modification in the Script commands.
 * 11/17/2015: Version 1.1
 * 11/16/2015: Fixed issue that allowed items remain in the storage after initiating a new game.
 * 11/14/2015: Version 1.0
