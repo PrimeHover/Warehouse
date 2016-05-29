@@ -2,6 +2,12 @@
 Warehouses for RPG Maker MV
 *created by PrimeHover*
 
+### License
+* This work is licensed under the Creative Commons Attribution 4.0 International License.
+* To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/
+* If this plugin is very useful to you and you want to help this plugin to keep improving, consider making a small donation using the link below:
+[![](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Q7CRGSXWBSP22)
+
 ### Installation
 * Download the JS file and include it into the ```/plugins``` folder of your project.
 * Open the Plugin Manager, select the file **PH_Warehouse.js**, and turn it on.
@@ -10,9 +16,11 @@ Warehouses for RPG Maker MV
 * You can check out an illustrative example about how to use the commands and rule [HERE](http://forums.rpgmakerweb.com/index.php?/topic/50503-ph-warehousestorage/).
 
 ### Parameters
-* ``Withdraw Text``:  Text shown in option "Withdraw".
+* ``All Together``: Defines whether or not you want to show the items in separated categories (0: false, 1: true).
+* ``Withdraw Text``: Text shown in option "Withdraw".
 * ``Deposit Text``: Text shown in option "Deposit".
-* ``Available Space Text``: Text shown in the information window.
+* ``Available Space Text``: Text shown in option "All" if the parameter "All Together" is set as true.
+* ``All Text``: Text shown in the information window.
 
 ### Plugin Commands
 * ``PHWarehouse create <Title of the Warehouse:50:rule>``: Creates a warehouse with 50 spaces if it does not exist. Substitute "50" for the maximum number of spaces that the warehouse will have. Substitute "rule" for the name of the rule you want to apply. If you leave the number in blank, the default size will be 50. If you leave the rule in blank, no rule will be applied.
@@ -72,6 +80,7 @@ The ``[commands]`` you can specify are as follow:
 * (If you don't specify the command "keyItem" in the rule, all key items will be allowed to be stored)
 
 ### ChangeLog
+* 05/29/2016: Version 1.2 (All Together option allows you to see all the items in just one category. It also provides compatibility with ``Shaz_NoCategory`` and ``MrTS_LimitedInventory`` plugins).
 * 11/19/2015: Bug fixed in the global variable that receives the parameters. Also, a small modification in the Script commands.
 * 11/17/2015: Version 1.1
 * 11/16/2015: Fixed issue that allowed items remain in the storage after initiating a new game.

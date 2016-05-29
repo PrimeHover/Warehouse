@@ -3,13 +3,17 @@
  PH - Warehouse/Storage
  @plugindesc This plugin allows the creation of warehouses where you can store items in the game.
  @author PrimeHover
- @version 1.1.1
- @date 11/19/2015
+ @version 1.2.0
+ @date 05/29/2016
 
  ---------------------------------------------------------------------------------------
  This work is licensed under the Creative Commons Attribution 4.0 International License.
  To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/
  ---------------------------------------------------------------------------------------
+
+ @param All Together
+ @desc Defines whether or not you want to show the items in separated categories (0: false, 1: true)
+ @default 0
 
  @param ---Vocabulary---
  @desc Use the spaces below to personalize the vocabulary of the plugin
@@ -22,6 +26,10 @@
  @param Deposit Text
  @desc Text shown in option "Deposit"
  @default Deposit
+
+ @param All Text
+ @desc Text shown in option "All" if the parameter "All Together" is set as true.
+ @default All
 
  @param Available Space Text
  @desc Text shown in the information window
@@ -75,39 +83,39 @@ Script Commands:
 
 Rule Commands:
 
-Rules are a simple way to manage which items you can store in a specific warehouse.
-In order to create a rule for your warehouse, you have to create a Common Event in the database called "PHWarehouse".
-Inside of that Common Event, you will create some comments in order to populate the rules for warehouses.
-These comments must have the following format:
+    Rules are a simple way to manage which items you can store in a specific warehouse.
+    In order to create a rule for your warehouse, you have to create a Common Event in the database called "PHWarehouse".
+    Inside of that Common Event, you will create some comments in order to populate the rules for warehouses.
+    These comments must have the following format:
 
-{Title of the Rule}
-[commands]
+    {Title of the Rule}
+    [commands]
 
-The [commands] you can specify are as follow:
+    The [commands] you can specify are as follow:
 
-item: 1 (Just allow the storage of the item with id 1)
-item: 1, 2, 3, 4 (Allows the storage of items with id 1, 2, 3 and 4)
-item: no (Does not allow the storage of items)
-item-n: 1 (Allows the storage of any item except the one with id 1)
-(If you don't specify the command "item" in the rule, all items will be allowed to be stored)
+    item: 1 (Just allow the storage of the item with id 1)
+    item: 1, 2, 3, 4 (Allows the storage of items with id 1, 2, 3 and 4)
+    item: no (Does not allow the storage of items)
+    item-n: 1 (Allows the storage of any item except the one with id 1)
+    (If you don't specify the command "item" in the rule, all items will be allowed to be stored)
 
-weapon: 1 (Just allow the storage of the weapon with id 1)
-weapon: 1, 2, 3, 4 (Allows the storage of weapons with id 1, 2, 3 and 4)
-weapon: no (Does not allow the storage of weapons)
-weapon-n: 1 (Allows the storage of any weapon except the one with id 1)
-(If you don't specify the command "weapon" in the rule, all weapons will be allowed to be stored)
+    weapon: 1 (Just allow the storage of the weapon with id 1)
+    weapon: 1, 2, 3, 4 (Allows the storage of weapons with id 1, 2, 3 and 4)
+    weapon: no (Does not allow the storage of weapons)
+    weapon-n: 1 (Allows the storage of any weapon except the one with id 1)
+    (If you don't specify the command "weapon" in the rule, all weapons will be allowed to be stored)
 
-armor: 1 (Just allow the storage of the armor with id 1)
-armor: 1, 2, 3, 4 (Allows the storage of armors with id 1, 2, 3 and 4)
-armor: no (Does not allow the storage of armors)
-armor-n: 1 (Allows the storage of any armor except the one with id 1)
-(If you don't specify the command "armor" in the rule, all armors will be allowed to be stored)
+    armor: 1 (Just allow the storage of the armor with id 1)
+    armor: 1, 2, 3, 4 (Allows the storage of armors with id 1, 2, 3 and 4)
+    armor: no (Does not allow the storage of armors)
+    armor-n: 1 (Allows the storage of any armor except the one with id 1)
+    (If you don't specify the command "armor" in the rule, all armors will be allowed to be stored)
 
-keyItem: 1 (Just allow the storage of the key item with id 1)
-keyItem: 1, 2, 3, 4 (Allows the storage of key items with id 1, 2, 3 and 4)
-keyItem: no (Does not allow the storage of key items)
-keyItem-n: 1 (Allows the storage of any key item except the one with id 1)
-(If you don't specify the command "keyItem" in the rule, all key items will be allowed to be stored)
+    keyItem: 1 (Just allow the storage of the key item with id 1)
+    keyItem: 1, 2, 3, 4 (Allows the storage of key items with id 1, 2, 3 and 4)
+    keyItem: no (Does not allow the storage of key items)
+    keyItem-n: 1 (Allows the storage of any key item except the one with id 1)
+    (If you don't specify the command "keyItem" in the rule, all key items will be allowed to be stored)
 
  */
 
@@ -120,9 +128,12 @@ PHPlugins.Params = PHPlugins.Params || {};
 PHPlugins.PHWarehouse = null;
 
 /* Getting the parameters */
-PHPlugins.PHWarehouseWithdrawText = String(PHPlugins.Parameters['Withdraw Text']);
-PHPlugins.PHWarehouseDepositText = String(PHPlugins.Parameters['Deposit Text']);
-PHPlugins.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available Space Text']);
+PHPlugins.Params.PHWarehouseWithdrawText = String(PHPlugins.Parameters['Withdraw Text']);
+PHPlugins.Params.PHWarehouseDepositText = String(PHPlugins.Parameters['Deposit Text']);
+PHPlugins.Params.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available Space Text']);
+PHPlugins.Params.PHWarehouseAllText = String(PHPlugins.Parameters['All Text']);
+PHPlugins.Params.PHWarehouseAllTogether = Number(PHPlugins.Parameters['All Together']) || 0;
+PHPlugins.Params.PHWarehouseAllTogether = Boolean(PHPlugins.Params.PHWarehouseAllTogether);
 
 (function() {
 
@@ -390,23 +401,46 @@ PHPlugins.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available
     };
 
     /* Verifies if an item is allowed to be withdrawn or deposited */
-    PHWarehouseManager.prototype.verifyItem = function(id) {
+    PHWarehouseManager.prototype.verifyItem = function(item) {
+        if (item == undefined) return false;
+        this.verifyAllTogether(item);
         if (this._warehouses[this._lastActive].rule == null ||
                 (this._rules.hasOwnProperty(this._warehouses[this._lastActive].rule) &&
                 Array.isArray(this._rules[this._warehouses[this._lastActive].rule].enabledItems[this._lastCategory]) &&
-                    (this._rules[this._warehouses[this._lastActive].rule].enabledItems[this._lastCategory].indexOf(id) > -1) ||
+                    (this._rules[this._warehouses[this._lastActive].rule].enabledItems[this._lastCategory].indexOf(item.id) > -1) ||
                     this._rules[this._warehouses[this._lastActive].rule].enabledItems[this._lastCategory].length == 0)) {
 
             /* Makes a second checking to see if this item is disabled */
             if (this._warehouses[this._lastActive].rule !== null &&
                 Array.isArray(this._rules[this._warehouses[this._lastActive].rule].disabledItems[this._lastCategory]) &&
-                this._rules[this._warehouses[this._lastActive].rule].disabledItems[this._lastCategory].indexOf(id) > -1) {
+                this._rules[this._warehouses[this._lastActive].rule].disabledItems[this._lastCategory].indexOf(item.id) > -1) {
                 return false;
             }
-
             return true;
         }
         return false;
+    };
+
+    /* Changes the last category if "all together" are set as true */
+    PHWarehouseManager.prototype.verifyAllTogether = function(item) {
+        if (PHPlugins.Params.PHWarehouseAllTogether == true) {
+            if (DataManager.isItem(item) && item.itypeId === 1) {
+                this._lastCategory = 'item';
+            } else if (DataManager.isArmor(item)) {
+                this._lastCategory = 'armor';
+            } else if (DataManager.isWeapon(item)) {
+                this._lastCategory = 'weapon';
+            } else if (DataManager.isItem(item) && item.itypeId === 2) {
+                this._lastCategory = 'keyItem';
+            }
+        }
+    };
+
+    /* Undo what the previous function has done */
+    PHWarehouseManager.prototype.undoAllTogetherVerification = function() {
+        if (PHPlugins.Params.PHWarehouseAllTogether == true) {
+            this._lastCategory = 'all';
+        }
     };
 
 
@@ -476,7 +510,10 @@ PHPlugins.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available
 
     /* Get the quantity for the corresponding item */
     PHWarehouseManager.prototype.getQuantity = function(item) {
-        return this._warehouses[this._lastActive].qtty[this._lastCategory][item.id];
+        this.verifyAllTogether(item);
+        var qtty = this._warehouses[this._lastActive].qtty[this._lastCategory][item.id];
+        this.undoAllTogetherVerification();
+        return qtty;
     };
 
     /* Checks whether or not the warehouse is already full */
@@ -495,18 +532,23 @@ PHPlugins.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available
     PHWarehouseManager.prototype.deposit = function(item) {
         if (this.checkCapacity()) {
 
-            var hasItem = false;
-            if (this._warehouses[this._lastActive].items[this._lastCategory].indexOf(item.id) > -1) {
-                hasItem = true;
-            }
+            this.verifyAllTogether(item);
+            if (this._lastCategory != 'all') {
+                var hasItem = false;
+                if (this._warehouses[this._lastActive].items[this._lastCategory].indexOf(item.id) > -1) {
+                    hasItem = true;
+                }
 
-            if (hasItem) {
-                this._warehouses[this._lastActive].qtty[this._lastCategory][item.id]++;
-            } else {
-                this._warehouses[this._lastActive].items[this._lastCategory].push(item.id);
-                this._warehouses[this._lastActive].qtty[this._lastCategory][item.id] = 1;
+                if (hasItem) {
+                    this._warehouses[this._lastActive].qtty[this._lastCategory][item.id]++;
+                } else {
+                    this._warehouses[this._lastActive].items[this._lastCategory].push(item.id);
+                    this._warehouses[this._lastActive].qtty[this._lastCategory][item.id] = 1;
+                }
+                this._warehouses[this._lastActive].currentCapacity++;
             }
-            this._warehouses[this._lastActive].currentCapacity++;
+            this.undoAllTogetherVerification();
+
         }
 
     };
@@ -514,20 +556,26 @@ PHPlugins.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available
     /* Withdraw from a warehouse */
     PHWarehouseManager.prototype.withdraw = function(item) {
 
-        var hasItem = false;
-        var index = this._warehouses[this._lastActive].items[this._lastCategory].indexOf(item.id);
-        if (index > -1) {
-            hasItem = true;
+        this.verifyAllTogether(item);
+
+        if (this._lastCategory != 'all') {
+            var hasItem = false;
+            var index = this._warehouses[this._lastActive].items[this._lastCategory].indexOf(item.id);
+            if (index > -1) {
+                hasItem = true;
+            }
+
+            if (hasItem) {
+                this._warehouses[this._lastActive].qtty[this._lastCategory][item.id]--;
+                if (this._warehouses[this._lastActive].qtty[this._lastCategory][item.id] == 0) {
+                    this._warehouses[this._lastActive].items[this._lastCategory].splice(index, 1);
+                    delete this._warehouses[this._lastActive].qtty[this._lastCategory][item.id];
+                }
+                this._warehouses[this._lastActive].currentCapacity--;
+            }
         }
 
-        if (hasItem) {
-            this._warehouses[this._lastActive].qtty[this._lastCategory][item.id]--;
-            if (this._warehouses[this._lastActive].qtty[this._lastCategory][item.id] == 0) {
-                this._warehouses[this._lastActive].items[this._lastCategory].splice(index, 1);
-                delete this._warehouses[this._lastActive].qtty[this._lastCategory][item.id];
-            }
-            this._warehouses[this._lastActive].currentCapacity--;
-        }
+        this.undoAllTogetherVerification();
 
     };
 
@@ -725,8 +773,8 @@ PHPlugins.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available
 
     Window_WarehouseOption.prototype.initialize = function() {
         Window_Selectable.prototype.initialize.call(this, 0, this.fittingHeight(1), Graphics.boxWidth, this.fittingHeight(1));
-        this.withdrawText = PHPlugins.PHWarehouseWithdrawText;
-        this.depositText = PHPlugins.PHWarehouseDepositText;
+        this.withdrawText = PHPlugins.Params.PHWarehouseWithdrawText;
+        this.depositText = PHPlugins.Params.PHWarehouseDepositText;
         this.refresh();
         this.select(0);
         this.activate();
@@ -771,6 +819,9 @@ PHPlugins.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available
     };
 
     Window_WarehouseCategory.prototype.maxCols = function() {
+        if (PHPlugins.Params.PHWarehouseAllTogether == true) {
+            return 1;
+        }
         var cols = 0;
         if (PHPlugins.PHWarehouse.isItemEnabled()) {
             cols++;
@@ -788,17 +839,21 @@ PHPlugins.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available
     };
 
     Window_WarehouseCategory.prototype.makeCommandList = function() {
-        if (PHPlugins.PHWarehouse.isItemEnabled()) {
-            this.addCommand(TextManager.item, 'item');
-        }
-        if (PHPlugins.PHWarehouse.isWeaponEnabled()) {
-            this.addCommand(TextManager.weapon, 'weapon');
-        }
-        if (PHPlugins.PHWarehouse.isArmorEnabled()) {
-            this.addCommand(TextManager.armor, 'armor');
-        }
-        if (PHPlugins.PHWarehouse.isKeyItemEnabled()) {
-            this.addCommand(TextManager.keyItem, 'keyItem');
+        if (PHPlugins.Params.PHWarehouseAllTogether == true) {
+            this.addCommand(PHPlugins.Params.PHWarehouseAllText, 'all');
+        } else {
+            if (PHPlugins.PHWarehouse.isItemEnabled()) {
+                this.addCommand(TextManager.item, 'item');
+            }
+            if (PHPlugins.PHWarehouse.isWeaponEnabled()) {
+                this.addCommand(TextManager.weapon, 'weapon');
+            }
+            if (PHPlugins.PHWarehouse.isArmorEnabled()) {
+                this.addCommand(TextManager.armor, 'armor');
+            }
+            if (PHPlugins.PHWarehouse.isKeyItemEnabled()) {
+                this.addCommand(TextManager.keyItem, 'keyItem');
+            }
         }
     };
 
@@ -841,18 +896,34 @@ PHPlugins.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available
     Window_WarehouseItemList.prototype.makeWarehouseItemList = function() {
         var data = PHPlugins.PHWarehouse.getItems();
         this._data = data.filter(function(item) {
-            return this.includes(item);
+            if (PHPlugins.Params.PHWarehouseAllTogether == true) {
+                return this.includes(item);
+            } else {
+                return this.includesWarehouseAll(item);
+            }
         }, this);
         if (this.includes(null)) {
             this._data.push(null);
         }
     };
 
+    Window_WarehouseItemList.prototype.includesWarehouseAll = function(item) {
+        return ( (DataManager.isItem(item) && item.itypeId === 1) || (DataManager.isWeapon(item)) || (DataManager.isArmor(item)) || (DataManager.isItem(item) && item.itypeId === 2) );
+    };
+
+    Window_WarehouseItemList.prototype.makeDepositAllItemList = function() {
+        this._data = $gameParty.allItems();
+    };
+
     Window_WarehouseItemList.prototype.loadItems = function() {
 
         // Deposit
         if (PHPlugins.PHWarehouse._lastOption == 1) {
-            this.makeItemList();
+            if (PHPlugins.Params.PHWarehouseAllTogether == true) {
+                this.makeDepositAllItemList();
+            } else {
+                this.makeItemList();
+            }
         }
 
         // Withdraw
@@ -869,7 +940,7 @@ PHPlugins.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available
             var rect = this.itemRect(index);
             rect.width -= this.textPadding();
 
-            this.changePaintOpacity(PHPlugins.PHWarehouse.verifyItem(item.id));
+            this.changePaintOpacity(PHPlugins.PHWarehouse.verifyItem(item));
             this.drawItemName(item, rect.x, rect.y, rect.width - numberWidth);
 
             if (PHPlugins.PHWarehouse._lastOption == 1) {
@@ -906,7 +977,7 @@ PHPlugins.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available
 
         // Deposit
         if (PHPlugins.PHWarehouse._lastOption == 1) {
-            if (PHPlugins.PHWarehouse.checkCapacity() && PHPlugins.PHWarehouse.verifyItem(item.id)) {
+            if (PHPlugins.PHWarehouse.checkCapacity() && PHPlugins.PHWarehouse.verifyItem(item)) {
                 SoundManager.playEquip();
                 PHPlugins.PHWarehouse.deposit(item);
                 $gameParty.loseItem(item, 1);
@@ -917,10 +988,15 @@ PHPlugins.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available
 
         // Withdraw
         else if (PHPlugins.PHWarehouse._lastOption == 0) {
-            if (PHPlugins.PHWarehouse.verifyItem(item.id)) {
-                SoundManager.playEquip();
-                PHPlugins.PHWarehouse.withdraw(item);
+            if (PHPlugins.PHWarehouse.verifyItem(item)) {
+                var numItems = $gameParty.numItems(item);
                 $gameParty.gainItem(item, 1);
+                if (numItems < $gameParty.numItems(item)) {
+                    SoundManager.playEquip();
+                    PHPlugins.PHWarehouse.withdraw(item);
+                } else {
+                    SoundManager.playBuzzer();
+                }
             } else {
                 SoundManager.playBuzzer();
             }
@@ -940,7 +1016,7 @@ PHPlugins.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available
 
     Window_WarehouseInfo.prototype.initialize = function() {
         Window_Base.prototype.initialize.call(this, 0, Graphics.boxHeight - this.fittingHeight(1), Graphics.boxWidth, this.fittingHeight(1));
-        this.availableSpaceText = PHPlugins.PHWarehouseAvailableSpaceText + " ";
+        this.availableSpaceText = PHPlugins.Params.PHWarehouseAvailableSpaceText + " ";
         this.refresh();
     };
 
