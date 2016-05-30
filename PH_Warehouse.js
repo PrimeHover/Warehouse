@@ -3,16 +3,24 @@
  PH - Warehouse/Storage
  @plugindesc This plugin allows the creation of warehouses where you can store items in the game.
  @author PrimeHover
- @version 1.2.0
- @date 05/29/2016
+ @version 1.2.1
+ @date 05/30/2016
 
  ---------------------------------------------------------------------------------------
  This work is licensed under the Creative Commons Attribution 4.0 International License.
  To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/
  ---------------------------------------------------------------------------------------
 
+ @param ---Options---
+ @desc Use the spaces below to customize the options of the plugin
+ @default
+
  @param All Together
  @desc Defines whether or not you want to show the items in separated categories (0: false, 1: true)
+ @default 0
+
+ @param Stack Item Quantity
+ @desc Defines whether or not you want to consider stacked items as a single space in the capacity (0: false, 1: true)
  @default 0
 
  @param ---Vocabulary---
@@ -65,19 +73,23 @@
  - PHWarehouse add armor <Title of the Warehouse:id:quantity>       # Add an armor immediately inside a created warehouse
  - PHWarehouse add keyItem <Title of the Warehouse:id:quantity>     # Add a key item immediately inside a created warehouse
 
+ - PHWarehouse capacity set <Title of the Warehouse:quantity>       # Set a new maximum capacity for a warehouse already created
+ - PHWarehouse capacity increase <Title of the Warehouse:quantity>  # Increase the maximum capacity for a warehouse already created
+ - PHWarehouse capacity decrease <Title of the Warehouse:quantity>  # Decrease the maximum capacity for a warehouse already created
+
 ----------------------------------------------------------------------------------------------------------------------------------
 
 Script Commands:
 
- - PHPlugins.PHWarehouse.prototype.exist("Title of the Warehouse");                   # Verifies if a warehouse exists
+ - PHPlugins.PHWarehouse.prototype.exist("Title of the Warehouse");                                # Verifies if a warehouse exists
 
- - PHPlugins.PHWarehouse.prototype.getMaxCapacity("Title of the Warehouse");          # Gets the maximum capacity of a warehouse
- - PHPlugins.PHWarehouse.prototype.getCurrentCapacity("Title of the Warehouse");      # Gets the current capacity of a warehouse
+ - PHPlugins.PHWarehouse.prototype.getMaxCapacity("Title of the Warehouse");                       # Gets the maximum capacity of a warehouse
+ - PHPlugins.PHWarehouse.prototype.getCurrentCapacity("Title of the Warehouse");                   # Gets the current capacity of a warehouse
 
- - PHPlugins.PHWarehouse.prototype.hasItem("Title of the Warehouse", id);             # Verifies if a warehouse has a particular item and returns the quantity of this item inside the warehouse
- - PHPlugins.PHWarehouse.prototype.hasWeapon("Title of the Warehouse", id);           # Verifies if a warehouse has a particular weapon and returns the quantity of this item inside the warehouse
- - PHPlugins.PHWarehouse.prototype.hasArmor("Title of the Warehouse", id);            # Verifies if a warehouse has a particular armor and returns the quantity of this item inside the warehouse
- - PHPlugins.PHWarehouse.prototype.hasKeyItem("Title of the Warehouse", id);          # Verifies if a warehouse has a particular key item and returns the quantity of this item inside the warehouse
+ - PHPlugins.PHWarehouse.prototype.hasItem("Title of the Warehouse", id);                          # Verifies if a warehouse has a particular item and returns the quantity of this item inside the warehouse
+ - PHPlugins.PHWarehouse.prototype.hasWeapon("Title of the Warehouse", id);                        # Verifies if a warehouse has a particular weapon and returns the quantity of this item inside the warehouse
+ - PHPlugins.PHWarehouse.prototype.hasArmor("Title of the Warehouse", id);                         # Verifies if a warehouse has a particular armor and returns the quantity of this item inside the warehouse
+ - PHPlugins.PHWarehouse.prototype.hasKeyItem("Title of the Warehouse", id);                       # Verifies if a warehouse has a particular key item and returns the quantity of this item inside the warehouse
 
  ----------------------------------------------------------------------------------------------------------------------------------
 
@@ -133,7 +145,9 @@ PHPlugins.Params.PHWarehouseDepositText = String(PHPlugins.Parameters['Deposit T
 PHPlugins.Params.PHWarehouseAvailableSpaceText = String(PHPlugins.Parameters['Available Space Text']);
 PHPlugins.Params.PHWarehouseAllText = String(PHPlugins.Parameters['All Text']);
 PHPlugins.Params.PHWarehouseAllTogether = Number(PHPlugins.Parameters['All Together']) || 0;
+PHPlugins.Params.PHWarehouseStackItemQuantity = Number(PHPlugins.Parameters['Stack Item Quantity']) || 0;
 PHPlugins.Params.PHWarehouseAllTogether = Boolean(PHPlugins.Params.PHWarehouseAllTogether);
+PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWarehouseStackItemQuantity);
 
 (function() {
 
@@ -443,6 +457,60 @@ PHPlugins.Params.PHWarehouseAllTogether = Boolean(PHPlugins.Params.PHWarehouseAl
         }
     };
 
+    /* Changes the maximum capacity of the warehouse for the given title */
+    PHWarehouseManager.prototype.setMaxCapacity = function(_sentence) {
+        var matches = this.checkSentence(_sentence);
+        if (matches != null) {
+            var results = matches.split(":");
+            if (results.length == 2) {
+                var title = results[0];
+                var capacity = parseInt(results[1]);
+                if (this._warehouses.hasOwnProperty(title) && !isNaN(capacity) && capacity >= this.getCurrentCapacity(title)) {
+                    this._warehouses[title].maxCapacity = capacity;
+                    if (this._warehouses[title].maxCapacity < 0) {
+                        this._warehouses[title].maxCapacity = 0;
+                    }
+                }
+            }
+        }
+    };
+
+    /* Increases the maximum capacity of the warehouse for the given title */
+    PHWarehouseManager.prototype.increaseMaxCapacity = function(_sentence) {
+        var matches = this.checkSentence(_sentence);
+        if (matches != null) {
+            var results = matches.split(":");
+            if (results.length == 2) {
+                var title = results[0];
+                var capacity = parseInt(results[1]);
+                if (this._warehouses.hasOwnProperty(title) && !isNaN(capacity) && (this._warehouses[title].maxCapacity + capacity) >= this.getCurrentCapacity(title)) {
+                    this._warehouses[title].maxCapacity += capacity;
+                    if (this._warehouses[title].maxCapacity < 0) {
+                        this._warehouses[title].maxCapacity = 0;
+                    }
+                }
+            }
+        }
+    };
+
+    /* Decreases the maximum capacity of the warehouse for the given title */
+    PHWarehouseManager.prototype.decreaseMaxCapacity = function(_sentence) {
+        var matches = this.checkSentence(_sentence);
+        if (matches != null) {
+            var results = matches.split(":");
+            if (results.length == 2) {
+                var title = results[0];
+                var capacity = parseInt(results[1]);
+                if (this._warehouses.hasOwnProperty(title) && !isNaN(capacity) && (this._warehouses[title].maxCapacity - capacity) >= this.getCurrentCapacity(title)) {
+                    this._warehouses[title].maxCapacity -= capacity;
+                    if (this._warehouses[title].maxCapacity < 0) {
+                        this._warehouses[title].maxCapacity = 0;
+                    }
+                }
+            }
+        }
+    };
+
 
 
     /* ---- MANAGEMENT METHODS ---- */
@@ -518,7 +586,8 @@ PHPlugins.Params.PHWarehouseAllTogether = Boolean(PHPlugins.Params.PHWarehouseAl
 
     /* Checks whether or not the warehouse is already full */
     PHWarehouseManager.prototype.checkCapacity = function() {
-        if (this._warehouses[this._lastActive].currentCapacity < this._warehouses[this._lastActive].maxCapacity) {
+        var capacity = this.getCurrentCapacity(this._lastActive);
+        if (capacity < this._warehouses[this._lastActive].maxCapacity) {
             return true;
         }
         return false;
@@ -617,7 +686,11 @@ PHPlugins.Params.PHWarehouseAllTogether = Boolean(PHPlugins.Params.PHWarehouseAl
     /* Return the value of the quantity of items in the warehouse for the given title */
     PHWarehouseManager.prototype.getCurrentCapacity = function(title) {
         if (this._warehouses.hasOwnProperty(title)) {
-            return this._warehouses[title].currentCapacity;
+            if (PHPlugins.Params.PHWarehouseStackItemQuantity == true) {
+                return (this._warehouses[title].items.item.length + this._warehouses[title].items.weapon.length + this._warehouses[title].items.keyItem.length + this._warehouses[title].items.armor.length);
+            } else {
+                return this._warehouses[title].currentCapacity;
+            }
         }
         return 0;
     };
@@ -717,6 +790,19 @@ PHPlugins.Params.PHWarehouseAllTogether = Boolean(PHPlugins.Params.PHWarehouseAl
                             break;
                         case 'keyItem':
                             PHPlugins.PHWarehouse.addItems(getAllArguments(args, 2), 'keyItem');
+                            break;
+                    }
+                    break;
+                case 'capacity':
+                    switch (args[1]) {
+                        case 'increase':
+                            PHPlugins.PHWarehouse.increaseMaxCapacity(getAllArguments(args, 2));
+                            break;
+                        case 'decrease':
+                            PHPlugins.PHWarehouse.decreaseMaxCapacity(getAllArguments(args, 2));
+                            break;
+                        case 'set':
+                            PHPlugins.PHWarehouse.setMaxCapacity(getAllArguments(args, 2));
                             break;
                     }
                     break;
@@ -897,9 +983,9 @@ PHPlugins.Params.PHWarehouseAllTogether = Boolean(PHPlugins.Params.PHWarehouseAl
         var data = PHPlugins.PHWarehouse.getItems();
         this._data = data.filter(function(item) {
             if (PHPlugins.Params.PHWarehouseAllTogether == true) {
-                return this.includes(item);
-            } else {
                 return this.includesWarehouseAll(item);
+            } else {
+                return this.includes(item);
             }
         }, this);
         if (this.includes(null)) {
@@ -1022,7 +1108,7 @@ PHPlugins.Params.PHWarehouseAllTogether = Boolean(PHPlugins.Params.PHWarehouseAl
 
     Window_WarehouseInfo.prototype.refresh = function() {
         this.contents.clear();
-        this.availableSpaceValue = (PHPlugins.PHWarehouse._warehouses[PHPlugins.PHWarehouse._lastActive].maxCapacity - PHPlugins.PHWarehouse._warehouses[PHPlugins.PHWarehouse._lastActive].currentCapacity) + " / " + PHPlugins.PHWarehouse._warehouses[PHPlugins.PHWarehouse._lastActive].maxCapacity;
+        this.availableSpaceValue = (PHPlugins.PHWarehouse._warehouses[PHPlugins.PHWarehouse._lastActive].maxCapacity - PHPlugins.PHWarehouse.getCurrentCapacity(PHPlugins.PHWarehouse._lastActive)) + " / " + PHPlugins.PHWarehouse._warehouses[PHPlugins.PHWarehouse._lastActive].maxCapacity;
         this.changeTextColor(this.normalColor());
         this.drawText(this.availableSpaceText + this.availableSpaceValue, 0, 0, this.x);
     };

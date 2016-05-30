@@ -17,6 +17,7 @@ Warehouses for RPG Maker MV
 
 ### Parameters
 * ``All Together``: Defines whether or not you want to show the items in separated categories (0: false, 1: true).
+* ``Stack Item Quantity``: Defines whether or not you want to consider stacked items as a single space in the capacity (0: false, 1: true).
 * ``Withdraw Text``: Text shown in option "Withdraw".
 * ``Deposit Text``: Text shown in option "Deposit".
 * ``Available Space Text``: Text shown in option "All" if the parameter "All Together" is set as true.
@@ -34,6 +35,9 @@ Warehouses for RPG Maker MV
 * ``PHWarehouse add weapon <Title of the Warehouse:id:quantity>``: Add a weapon immediately inside a created warehouse.
 * ``PHWarehouse add armor <Title of the Warehouse:id:quantity>``: Add an armor immediately inside a created warehouse.
 * ``PHWarehouse add keyItem <Title of the Warehouse:id:quantity>``: Add a key item immediately inside a created warehouse.
+* ``PHWarehouse capacity set <Title of the Warehouse:quantity>``: Set a new maximum capacity for a warehouse already created.
+* ``PHWarehouse capacity increase <Title of the Warehouse:quantity>``: Increase the maximum capacity for a warehouse already created.
+* ``PHWarehouse capacity decrease <Title of the Warehouse:quantity>``: Decrease the maximum capacity for a warehouse already created.
 
 ### Script Calls
 * ``PHPlugins.PHWarehouse.getMaxCapacity("Title of the Warehouse")``: Gets the maximum capacity of a warehouse (returns a number).
@@ -50,7 +54,7 @@ In order to create a rule for your warehouse, you have to create a Common Event 
 Inside of that Common Event, you will create some comments in order to populate the rules for warehouses.
 These comments must have the following format:
 
-``{Title of the Rule}``     
+``{Title of the Rule}``    
 ``[commands]``
 
 The ``[commands]`` you can specify are as follow:
@@ -80,6 +84,7 @@ The ``[commands]`` you can specify are as follow:
 * (If you don't specify the command "keyItem" in the rule, all key items will be allowed to be stored)
 
 ### ChangeLog
+* 05/30/2016: Version 1.2.1 (Stack items as a single space in your storage. Increase/Decrease the maximum capacity of a warehouse. Bug fixes).
 * 05/29/2016: Version 1.2 (All Together option allows you to see all the items in just one category. It also provides compatibility with ``Shaz_NoCategory`` and ``MrTS_LimitedInventory`` plugins).
 * 11/19/2015: Bug fixed in the global variable that receives the parameters. Also, a small modification in the Script commands.
 * 11/17/2015: Version 1.1
