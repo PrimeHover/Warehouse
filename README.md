@@ -13,7 +13,7 @@ Warehouses for RPG Maker MV
 * Open the Plugin Manager, select the file **PH_Warehouse.js**, and turn it on.
 
 ### How to Use
-* You can check out an illustrative example about how to use the commands and rule [HERE](http://forums.rpgmakerweb.com/index.php?/topic/50503-ph-warehousestorage/).
+* You can check out an illustrative example about how to use the commands and rule [HERE](http://primehover.gufernandes.com.br/ph-warehouse).
 
 ### Parameters
 * ``All Together``: Defines whether or not you want to show the items in separated categories (0: false, 1: true).
