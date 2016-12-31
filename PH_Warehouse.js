@@ -2,14 +2,15 @@
 
  PH - Warehouse/Storage
  @plugindesc This plugin allows the creation of warehouses where you can store items in the game.
- @author PrimeHover
- @version 1.2.1
+ @author PrimeHover (renaming edits by Hikitsune-Red 火狐)
+ @version 1.2.1red
  @date 05/30/2016
 
  ---------------------------------------------------------------------------------------
  This work is licensed under the Creative Commons Attribution 4.0 International License.
  To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/
  ---------------------------------------------------------------------------------------
+ Just credit PrimeHover and Hikitsune-Red 火狐 in your project
 
  @param ---Options---
  @desc Use the spaces below to customize the options of the plugin
@@ -60,6 +61,7 @@
  - PHWarehouse create <Title of the Warehouse:50>                   # Creates a warehouse and sets its maximum capacity to 50
  - PHWarehouse create <Title of the Warehouse:50:rule>              # Creates a warehouse, sets its maximum capacity to 50 and sets a rule
 
+ - PHWarehouse rename <Title of the Warehouse:New Warehouse Name>	# Renames a warehouse
  - PHWarehouse show <Title of the Warehouse>                        # Shows a warehouse
  - PHWarehouse remove <Title of the Warehouse>                      # Removes a warehouse
 
@@ -192,6 +194,7 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
 
                 this._warehouses[title] = {
                     title: title,
+					name: title,
                     maxCapacity: capacity,
                     currentCapacity: 0,
                     rule: rule,
@@ -215,6 +218,22 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
         }
 
     };
+	
+	/* Renames a warehouse */
+	PHWarehouseManager.prototype.renameWarehouse = function(_sentence) {
+		var matches = this.checkSentence(_sentence);
+		var results;
+		var title;
+		
+		if (matches != null) {
+			results = matches.split(":");
+			title = results[0];
+			
+			if (this._warehouses.hasOwnProperty(title)) {
+				this._warehouses[title].name = results[1];
+			};
+		};
+	};
 
     /* Opens a warehouse */
     PHWarehouseManager.prototype.openWarehouse = function(_sentence) {
@@ -770,6 +789,9 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
                 case 'create':
                     PHPlugins.PHWarehouse.createWarehouse(getAllArguments(args, 1));
                     break;
+				case 'rename':
+					PHPlugins.PHWarehouse.renameWarehouse(getAllArguments(args, 1));
+					break;
                 case 'show':
                     PHPlugins.PHWarehouse.openWarehouse(getAllArguments(args, 1));
                     SceneManager.push(Scene_Warehouse);
@@ -846,7 +868,7 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
     Window_WarehouseTitle.prototype.refresh = function() {
         this.contents.clear();
         this.changeTextColor(this.crisisColor());
-        this.drawText(PHPlugins.PHWarehouse._lastActive, 0, 0, Graphics.boxWidth, "center");
+        this.drawText(PHPlugins.PHWarehouse._warehouses[PHPlugins.PHWarehouse._lastActive].name, 0, 0, Graphics.boxWidth, "center");
     };
 
 
@@ -1077,12 +1099,8 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
             if (PHPlugins.PHWarehouse.verifyItem(item)) {
                 var numItems = $gameParty.numItems(item);
                 $gameParty.gainItem(item, 1);
-                if (numItems < $gameParty.numItems(item)) {
-                    SoundManager.playEquip();
-                    PHPlugins.PHWarehouse.withdraw(item);
-                } else {
-                    SoundManager.playBuzzer();
-                }
+				SoundManager.playEquip();
+				PHPlugins.PHWarehouse.withdraw(item);
             } else {
                 SoundManager.playBuzzer();
             }
