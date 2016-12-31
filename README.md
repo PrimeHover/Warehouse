@@ -1,6 +1,7 @@
 # PH_Warehouse.js
 Warehouses for RPG Maker MV     
 *created by PrimeHover*
+
 *renaming edits by Hikitsune-Red 火狐*
 
 ### License
@@ -26,7 +27,7 @@ Warehouses for RPG Maker MV
 
 ### Plugin Commands
 * ``PHWarehouse create <Title of the Warehouse:50:rule>``: Creates a warehouse with 50 spaces if it does not exist. Substitute "50" for the maximum number of spaces that the warehouse will have. Substitute "rule" for the name of the rule you want to apply. If you leave the number in blank, the default size will be 50. If you leave the rule in blank, no rule will be applied.
-* ``PHWarehouse rename <Title of the Warehouse:New Warehouse Name>	# Renames a warehouse
+* ``PHWarehouse rename <Title of the Warehouse:New Warehouse Name>``: Renames a warehouse
 * ``PHWarehouse show <Title of the Warehouse>``: Shows a warehouse on the screen.
 * ``PHWarehouse remove <Title of the Warehouse>``: Removes a warehouse and its remaining items.
 * ``PHWarehouse loot item <Title of the Warehouse:id:quantity>``: Add an item for loot bonus inside a created warehouse.
