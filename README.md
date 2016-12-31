@@ -1,6 +1,7 @@
 # PH_Warehouse.js
 Warehouses for RPG Maker MV     
 *created by PrimeHover*
+*renaming edits by Hikitsune-Red 火狐*
 
 ### License
 * This work is licensed under the Creative Commons Attribution 4.0 International License.
@@ -25,6 +26,7 @@ Warehouses for RPG Maker MV
 
 ### Plugin Commands
 * ``PHWarehouse create <Title of the Warehouse:50:rule>``: Creates a warehouse with 50 spaces if it does not exist. Substitute "50" for the maximum number of spaces that the warehouse will have. Substitute "rule" for the name of the rule you want to apply. If you leave the number in blank, the default size will be 50. If you leave the rule in blank, no rule will be applied.
+* ``PHWarehouse rename <Title of the Warehouse:New Warehouse Name>	# Renames a warehouse
 * ``PHWarehouse show <Title of the Warehouse>``: Shows a warehouse on the screen.
 * ``PHWarehouse remove <Title of the Warehouse>``: Removes a warehouse and its remaining items.
 * ``PHWarehouse loot item <Title of the Warehouse:id:quantity>``: Add an item for loot bonus inside a created warehouse.
@@ -84,6 +86,7 @@ The ``[commands]`` you can specify are as follow:
 * (If you don't specify the command "keyItem" in the rule, all key items will be allowed to be stored)
 
 ### ChangeLog
+* 12/31/2016: Version 1.2.1red (Edited in some simple renaming functionality)
 * 05/30/2016: Version 1.2.1 (Stack items as a single space in your storage. Increase/Decrease the maximum capacity of a warehouse. Bug fixes).
 * 05/29/2016: Version 1.2 (All Together option allows you to see all the items in just one category. It also provides compatibility with ``Shaz_NoCategory`` and ``MrTS_LimitedInventory`` plugins).
 * 11/19/2015: Bug fixed in the global variable that receives the parameters. Also, a small modification in the Script commands.
