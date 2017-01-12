@@ -27,7 +27,7 @@ Warehouses for RPG Maker MV
 
 ### Plugin Commands
 * ``PHWarehouse create <Title of the Warehouse:50:rule>``: Creates a warehouse with 50 spaces if it does not exist. Substitute "50" for the maximum number of spaces that the warehouse will have. Substitute "rule" for the name of the rule you want to apply. If you leave the number in blank, the default size will be 50. If you leave the rule in blank, no rule will be applied.
-* ``PHWarehouse rename <Title of the Warehouse:New Warehouse Name>``: Renames a warehouse
+* ``PHWarehouse rename <Title of the Warehouse:New Warehouse Name>``: Changes the display name of a warehouse
 * ``PHWarehouse show <Title of the Warehouse>``: Shows a warehouse on the screen.
 * ``PHWarehouse remove <Title of the Warehouse>``: Removes a warehouse and its remaining items.
 * ``PHWarehouse loot item <Title of the Warehouse:id:quantity>``: Add an item for loot bonus inside a created warehouse.
@@ -39,6 +39,7 @@ Warehouses for RPG Maker MV
 * ``PHWarehouse add weapon <Title of the Warehouse:id:quantity>``: Add a weapon immediately inside a created warehouse.
 * ``PHWarehouse add armor <Title of the Warehouse:id:quantity>``: Add an armor immediately inside a created warehouse.
 * ``PHWarehouse add keyItem <Title of the Warehouse:id:quantity>``: Add a key item immediately inside a created warehouse.
+* ``PHWarehouse addRandom "CATEGORY" <Title of the Warehouse:idlist:quantity>``: Same as above where "CATEGORY" is either item, weapon, armor, or keyItem, and idlist is a list of item ids separated by the | symbol. Quantity will cause there to be at minimum 1 to a maximum of QUANTITY of that item.
 * ``PHWarehouse capacity set <Title of the Warehouse:quantity>``: Set a new maximum capacity for a warehouse already created.
 * ``PHWarehouse capacity increase <Title of the Warehouse:quantity>``: Increase the maximum capacity for a warehouse already created.
 * ``PHWarehouse capacity decrease <Title of the Warehouse:quantity>``: Decrease the maximum capacity for a warehouse already created.
