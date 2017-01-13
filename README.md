@@ -89,6 +89,7 @@ The ``[commands]`` you can specify are as follow:
 * (If you don't specify the command "keyItem" in the rule, all key items will be allowed to be stored)
 
 ### ChangeLog
+* 01/13/2017: Version 1.2.1 HKRv2.1 (Fixed a bug causing there to be more loot items than intended)
 * 01/12/2017: Version 1.2.1 HKR v2 (Added randomizable id/quantity functionality)
 * 12/31/2016: Version 1.2.1red (Edited in some simple renaming functionality)
 * 05/30/2016: Version 1.2.1 (Stack items as a single space in your storage. Increase/Decrease the maximum capacity of a warehouse. Bug fixes).
