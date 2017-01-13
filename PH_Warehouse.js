@@ -1,7 +1,7 @@
 /*:
 
  PH - Warehouse/Storage
- @plugindesc This plugin allows the creation of warehouses where you can store items in the game.
+ @plugindesc v1.2.1 HKRv2 - This plugin allows the creation of warehouses where you can store items in the game.
  @author PrimeHover and Hikitsune-Red 火狐
  @version 1.2.1 HKR v2
  @date 05/30/2016
