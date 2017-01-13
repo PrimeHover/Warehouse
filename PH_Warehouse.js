@@ -1,10 +1,10 @@
 /*:
 
  PH - Warehouse/Storage
- @plugindesc v1.2.1 HKRv2 - This plugin allows the creation of warehouses where you can store items in the game.
+ @plugindesc v1.2.1 HKR v2.1 - This plugin allows the creation of warehouses where you can store items in the game.
  @author PrimeHover and Hikitsune-Red 火狐
- @version 1.2.1 HKR v2
- @date 05/30/2016
+ @version 1.2.1 HKR v2.1
+ @date 01/13/2017
 
  ---------------------------------------------------------------------------------------
  This work is licensed under the Creative Commons Attribution 4.0 International License.
@@ -316,11 +316,13 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
         if (matches != null) {
             results = matches.split(":");
             if (this._warehouses.hasOwnProperty(results[0]) && this._warehouses[results[0]].lootBonus && typeof results[1] !== "undefined" && typeof results[2] !== "undefined") {
-                resultstwo = results[1].split("|");
-				console.log(resultstwo);
-				choice = Math.floor(Math.random() * (resultstwo.length - 1)) + 1;
+                console.log(this._warehouses[results[0]].lootBonus);
+				resultstwo = results[1].split("|");
+				choice = Math.floor(Math.random() * (resultstwo.length - 1));
 				results[1] = parseInt(resultstwo[choice]);
+				console.log(parseInt(results[2]));
                 results[2] = Math.floor(Math.random() * parseInt(results[2])) + 1;
+				console.log(results[2]);
                 if (results[2] > this._warehouses[results[0]].maxCapacity - this._warehouses[results[0]].currentCapacity) {
                     results[2] = this._warehouses[results[0]].maxCapacity - this._warehouses[results[0]].currentCapacity;
                 }
@@ -378,7 +380,7 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
             if (this._warehouses.hasOwnProperty(results[0]) && typeof results[1] !== "undefined" && typeof results[2] !== "undefined") {
                 resultstwo = results[1].split("|");
 				console.log(resultstwo);
-				choice = Math.floor(Math.random() * (resultstwo.length - 1)) + 1;
+				choice = Math.floor(Math.random() * (resultstwo.length - 1));
 				results[1] = parseInt(resultstwo[choice]);
                 results[2] = Math.floor(Math.random() * parseInt(results[2])) + 1;
                 if (results[2] > this._warehouses[results[0]].maxCapacity - this._warehouses[results[0]].currentCapacity) {
@@ -944,6 +946,7 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
                             PHPlugins.PHWarehouse.addRandomLoot(getAllArguments(args, 2), 'keyItem');
                             break;
 					}
+					break;
 				case 'addRandom':
                     switch (args[1]) {
                         case 'item':
