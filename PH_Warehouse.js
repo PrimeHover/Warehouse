@@ -1,15 +1,16 @@
 /*:
 
  PH - Warehouse/Storage
- @plugindesc This plugin allows the creation of warehouses where you can store items in the game.
- @author PrimeHover
- @version 1.2.1
- @date 05/30/2016
+ @plugindesc v1.2.1 HKR v2.1 - This plugin allows the creation of warehouses where you can store items in the game.
+ @author PrimeHover and Hikitsune-Red 火狐
+ @version 1.2.1 HKR v2.1
+ @date 01/13/2017
 
  ---------------------------------------------------------------------------------------
  This work is licensed under the Creative Commons Attribution 4.0 International License.
  To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/
  ---------------------------------------------------------------------------------------
+ Just credit PrimeHover and Hikitsune-Red 火狐 in your project
 
  @param ---Options---
  @desc Use the spaces below to customize the options of the plugin
@@ -48,7 +49,8 @@
  Warehouse/Storage Plugin
  created by PrimeHover
 
- Check out the full documentation at: https://github.com/PrimeHover/Warehouse
+ Check out the original documentation at: https://github.com/PrimeHover/Warehouse
+ Check out the full RED documentation at: https://github.com/Hikitsune-Red/Warehouse
  Check out an illustrative example of using the commands and rules at: http://forums.rpgmakerweb.com/index.php?/topic/50503-ph-warehousestorage/
  Check out the portuguese example at: http://www.mundorpgmaker.com.br/topic/114053-ph-warehousestorage/
 
@@ -56,27 +58,48 @@
 
  Plugin Commands:
 
- - PHWarehouse create <Title of the Warehouse>                      # Creates a warehouse
- - PHWarehouse create <Title of the Warehouse:50>                   # Creates a warehouse and sets its maximum capacity to 50
- - PHWarehouse create <Title of the Warehouse:50:rule>              # Creates a warehouse, sets its maximum capacity to 50 and sets a rule
+ - PHWarehouse create <Title of the Warehouse>                           # Creates a warehouse
+ - PHWarehouse create <Title of the Warehouse:50>                        # Creates a warehouse and sets its maximum capacity to 50
+ - PHWarehouse create <Title of the Warehouse:50:rule>                   # Creates a warehouse, sets its maximum capacity to 50 and sets a rule
 
- - PHWarehouse show <Title of the Warehouse>                        # Shows a warehouse
- - PHWarehouse remove <Title of the Warehouse>                      # Removes a warehouse
+ - PHWarehouse rename <Title of the Warehouse:New Warehouse Name>        # Sets display name a warehouse
+ - PHWarehouse show <Title of the Warehouse>                             # Shows a warehouse
+ - PHWarehouse remove <Title of the Warehouse>                           # Removes a warehouse
 
- - PHWarehouse loot item <Title of the Warehouse:id:quantity>       # Add an item for loot bonus inside a created warehouse
- - PHWarehouse loot weapon <Title of the Warehouse:id:quantity>     # Add a weapon for loot bonus inside a created warehouse
- - PHWarehouse loot armor <Title of the Warehouse:id:quantity>      # Add an armor for loot bonus inside a created warehouse
- - PHWarehouse loot keyItem <Title of the Warehouse:id:quantity>    # Add a key item for loot bonus inside a created warehouse
+ - PHWarehouse loot item <Title of the Warehouse:id:quantity>            # Add an item for loot bonus inside a created warehouse
+ - PHWarehouse loot weapon <Title of the Warehouse:id:quantity>          # Add a weapon for loot bonus inside a created warehouse
+ - PHWarehouse loot armor <Title of the Warehouse:id:quantity>           # Add an armor for loot bonus inside a created warehouse
+ - PHWarehouse loot keyItem <Title of the Warehouse:id:quantity>         # Add a key item for loot bonus inside a created warehouse
 
- - PHWarehouse add item <Title of the Warehouse:id:quantity>        # Add an item immediately inside a created warehouse
- - PHWarehouse add weapon <Title of the Warehouse:id:quantity>      # Add a weapon immediately inside a created warehouse
- - PHWarehouse add armor <Title of the Warehouse:id:quantity>       # Add an armor immediately inside a created warehouse
- - PHWarehouse add keyItem <Title of the Warehouse:id:quantity>     # Add a key item immediately inside a created warehouse
+ - PHWarehouse add item <Title of the Warehouse:id:quantity>             # Add an item immediately inside a created warehouse
+ - PHWarehouse add weapon <Title of the Warehouse:id:quantity>           # Add a weapon immediately inside a created warehouse
+ - PHWarehouse add armor <Title of the Warehouse:id:quantity>            # Add an armor immediately inside a created warehouse
+ - PHWarehouse add keyItem <Title of the Warehouse:id:quantity>          # Add a key item immediately inside a created warehouse
 
- - PHWarehouse capacity set <Title of the Warehouse:quantity>       # Set a new maximum capacity for a warehouse already created
- - PHWarehouse capacity increase <Title of the Warehouse:quantity>  # Increase the maximum capacity for a warehouse already created
- - PHWarehouse capacity decrease <Title of the Warehouse:quantity>  # Decrease the maximum capacity for a warehouse already created
+ - PHWarehouse capacity set <Title of the Warehouse:quantity>            # Set a new maximum capacity for a warehouse already created
+ - PHWarehouse capacity increase <Title of the Warehouse:quantity>       # Increase the maximum capacity for a warehouse already created
+ - PHWarehouse capacity decrease <Title of the Warehouse:quantity>       # Decrease the maximum capacity for a warehouse already created
+ 
+ ============
+ 
+ NOTE: For the below commands, id can be a list of id numbers separated by the | symbol
+       To increas the odds of one id being picked over another, simply have multiple instances of that number
+	   (example: "PHWarehouse randomLoot item <TestWarehouse:1|1|1|1|1|1|2|2|4|4|5:8" wherein item id 1 has a higher chance of being picked)
+	   
+	   Quantity will be randomized (if 8 is the quantity, there could be a minimum of 1 to a maximum of 8 of that item in the chest)
+ 
+ ============
+ 
+ - PHWarehouse randomLoot item <Title of the Warehouse:id:quantity>      # Add an item for loot bonus inside a created warehouse
+ - PHWarehouse randomLoot weapon <Title of the Warehouse:id:quantity>    # Add a weapon for loot bonus inside a created warehouse
+ - PHWarehouse randomLoot armor <Title of the Warehouse:id:quantity>     # Add an armor for loot bonus inside a created warehouse
+ - PHWarehouse randomLoot keyItem <Title of the Warehouse:id:quantity>   # Add a key item for loot bonus inside a created warehouse
 
+ - PHWarehouse addRandom item <Title of the Warehouse:id:quantity>       # Add an item immediately inside a created warehouse
+ - PHWarehouse addRandom weapon <Title of the Warehouse:id:quantity>     # Add a weapon immediately inside a created warehouse
+ - PHWarehouse addRandom armor <Title of the Warehouse:id:quantity>      # Add an armor immediately inside a created warehouse
+ - PHWarehouse addRandom keyItem <Title of the Warehouse:id:quantity>    # Add a key item immediately inside a created warehouse
+ 
 ----------------------------------------------------------------------------------------------------------------------------------
 
 Script Commands:
@@ -192,6 +215,7 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
 
                 this._warehouses[title] = {
                     title: title,
+					name: title,
                     maxCapacity: capacity,
                     currentCapacity: 0,
                     rule: rule,
@@ -215,6 +239,22 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
         }
 
     };
+	
+	/* Renames a warehouse */
+	PHWarehouseManager.prototype.renameWarehouse = function(_sentence) {
+		var matches = this.checkSentence(_sentence);
+		var results;
+		var title;
+		
+		if (matches != null) {
+			results = matches.split(":");
+			title = results[0];
+			
+			if (this._warehouses.hasOwnProperty(title)) {
+				this._warehouses[title].name = results[1];
+			};
+		};
+	};
 
     /* Opens a warehouse */
     PHWarehouseManager.prototype.openWarehouse = function(_sentence) {
@@ -264,6 +304,40 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
         }
 
     };
+	
+	/* Add a randomized loot bonus */
+    PHWarehouseManager.prototype.addRandomLoot = function(_sentence, category) {
+
+        var matches = this.checkSentence(_sentence);
+        var results;
+        var resultstwo;
+		var choice;
+
+        if (matches != null) {
+            results = matches.split(":");
+            if (this._warehouses.hasOwnProperty(results[0]) && this._warehouses[results[0]].lootBonus && typeof results[1] !== "undefined" && typeof results[2] !== "undefined") {
+                console.log(this._warehouses[results[0]].lootBonus);
+				resultstwo = results[1].split("|");
+				choice = Math.floor(Math.random() * (resultstwo.length - 1));
+				results[1] = parseInt(resultstwo[choice]);
+				console.log(parseInt(results[2]));
+                results[2] = Math.floor(Math.random() * parseInt(results[2])) + 1;
+				console.log(results[2]);
+                if (results[2] > this._warehouses[results[0]].maxCapacity - this._warehouses[results[0]].currentCapacity) {
+                    results[2] = this._warehouses[results[0]].maxCapacity - this._warehouses[results[0]].currentCapacity;
+                }
+
+                if (this._warehouses[results[0]].items[category].indexOf(results[1]) > -1) {
+                    this._warehouses[results[0]].qtty[category][results[1]] += results[2];
+                } else {
+                    this._warehouses[results[0]].items[category].push(results[1]);
+                    this._warehouses[results[0]].qtty[category][results[1]] = results[2];
+                }
+                this._warehouses[results[0]].currentCapacity += results[2];
+            }
+        }
+
+    };
 
     /* Add item to a warehouse */
     PHWarehouseManager.prototype.addItems = function(_sentence, category) {
@@ -277,6 +351,38 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
                 results[1] = parseInt(results[1]);
                 results[2] = parseInt(results[2]);
 
+                if (results[2] > this._warehouses[results[0]].maxCapacity - this._warehouses[results[0]].currentCapacity) {
+                    results[2] = this._warehouses[results[0]].maxCapacity - this._warehouses[results[0]].currentCapacity;
+                }
+
+                if (this._warehouses[results[0]].items[category].indexOf(results[1]) > -1) {
+                    this._warehouses[results[0]].qtty[category][results[1]] += results[2];
+                } else {
+                    this._warehouses[results[0]].items[category].push(results[1]);
+                    this._warehouses[results[0]].qtty[category][results[1]] = results[2];
+                }
+                this._warehouses[results[0]].currentCapacity += results[2];
+            }
+        }
+
+    };
+	
+	/* Add a randomized item */
+    PHWarehouseManager.prototype.addRandomItems = function(_sentence, category) {
+
+        var matches = this.checkSentence(_sentence);
+        var results;
+        var resultstwo;
+		var choice;
+
+        if (matches != null) {
+            results = matches.split(":");
+            if (this._warehouses.hasOwnProperty(results[0]) && typeof results[1] !== "undefined" && typeof results[2] !== "undefined") {
+                resultstwo = results[1].split("|");
+				console.log(resultstwo);
+				choice = Math.floor(Math.random() * (resultstwo.length - 1));
+				results[1] = parseInt(resultstwo[choice]);
+                results[2] = Math.floor(Math.random() * parseInt(results[2])) + 1;
                 if (results[2] > this._warehouses[results[0]].maxCapacity - this._warehouses[results[0]].currentCapacity) {
                     results[2] = this._warehouses[results[0]].maxCapacity - this._warehouses[results[0]].currentCapacity;
                 }
@@ -770,6 +876,9 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
                 case 'create':
                     PHPlugins.PHWarehouse.createWarehouse(getAllArguments(args, 1));
                     break;
+				case 'rename':
+					PHPlugins.PHWarehouse.renameWarehouse(getAllArguments(args, 1));
+					break;
                 case 'show':
                     PHPlugins.PHWarehouse.openWarehouse(getAllArguments(args, 1));
                     SceneManager.push(Scene_Warehouse);
@@ -822,6 +931,38 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
                             break;
                     }
                     break;
+				case 'randomLoot':
+					switch (args[1]) {
+						case 'item':
+                            PHPlugins.PHWarehouse.addRandomLoot(getAllArguments(args, 2), 'item');
+                            break;
+                        case 'weapon':
+                            PHPlugins.PHWarehouse.addRandomLoot(getAllArguments(args, 2), 'weapon');
+                            break;
+                        case 'armor':
+                            PHPlugins.PHWarehouse.addRandomLoot(getAllArguments(args, 2), 'armor');
+                            break;
+                        case 'keyItem':
+                            PHPlugins.PHWarehouse.addRandomLoot(getAllArguments(args, 2), 'keyItem');
+                            break;
+					}
+					break;
+				case 'addRandom':
+                    switch (args[1]) {
+                        case 'item':
+                            PHPlugins.PHWarehouse.addRandomItems(getAllArguments(args, 2), 'item');
+                            break;
+                        case 'weapon':
+                            PHPlugins.PHWarehouse.addRandomItems(getAllArguments(args, 2), 'weapon');
+                            break;
+                        case 'armor':
+                            PHPlugins.PHWarehouse.addRandomItems(getAllArguments(args, 2), 'armor');
+                            break;
+                        case 'keyItem':
+                            PHPlugins.PHWarehouse.addRandomItems(getAllArguments(args, 2), 'keyItem');
+                            break;
+                    }
+                    break;
             }
         }
     };
@@ -846,7 +987,7 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
     Window_WarehouseTitle.prototype.refresh = function() {
         this.contents.clear();
         this.changeTextColor(this.crisisColor());
-        this.drawText(PHPlugins.PHWarehouse._lastActive, 0, 0, Graphics.boxWidth, "center");
+        this.drawText(PHPlugins.PHWarehouse._warehouses[PHPlugins.PHWarehouse._lastActive].name, 0, 0, Graphics.boxWidth, "center");
     };
 
 
@@ -1077,12 +1218,8 @@ PHPlugins.Params.PHWarehouseStackItemQuantity = Boolean(PHPlugins.Params.PHWareh
             if (PHPlugins.PHWarehouse.verifyItem(item)) {
                 var numItems = $gameParty.numItems(item);
                 $gameParty.gainItem(item, 1);
-                if (numItems < $gameParty.numItems(item)) {
-                    SoundManager.playEquip();
-                    PHPlugins.PHWarehouse.withdraw(item);
-                } else {
-                    SoundManager.playBuzzer();
-                }
+				SoundManager.playEquip();
+				PHPlugins.PHWarehouse.withdraw(item);
             } else {
                 SoundManager.playBuzzer();
             }

@@ -2,6 +2,8 @@
 Warehouses for RPG Maker MV     
 *created by PrimeHover*
 
+*contains edits by Hikitsune-Red 火狐*
+
 ### License
 * This work is licensed under the Creative Commons Attribution 4.0 International License.
 * To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/
@@ -25,16 +27,19 @@ Warehouses for RPG Maker MV
 
 ### Plugin Commands
 * ``PHWarehouse create <Title of the Warehouse:50:rule>``: Creates a warehouse with 50 spaces if it does not exist. Substitute "50" for the maximum number of spaces that the warehouse will have. Substitute "rule" for the name of the rule you want to apply. If you leave the number in blank, the default size will be 50. If you leave the rule in blank, no rule will be applied.
+* ``PHWarehouse rename <Title of the Warehouse:New Warehouse Name>``: Changes the display name of a warehouse
 * ``PHWarehouse show <Title of the Warehouse>``: Shows a warehouse on the screen.
 * ``PHWarehouse remove <Title of the Warehouse>``: Removes a warehouse and its remaining items.
 * ``PHWarehouse loot item <Title of the Warehouse:id:quantity>``: Add an item for loot bonus inside a created warehouse.
 * ``PHWarehouse loot weapon <Title of the Warehouse:id:quantity>``: Add a weapon for loot bonus inside a created warehouse.
 * ``PHWarehouse loot armor <Title of the Warehouse:id:quantity>``: Add an armor for loot bonus inside a created warehouse.
 * ``PHWarehouse loot keyItem <Title of the Warehouse:id:quantity>``: Add a key item for loot bonus inside a created warehouse.
+* ``PHWarehouse randomLoot "CATEGORY" <Title of the Warehouse:idlist:quantity>``: Same as above where "CATEGORY" is either item, weapon, armor, or keyItem, and idlist is a list of item ids separated by the | symbol. Quantity will cause there to be at minimum 1 to a maximum of QUANTITY of that item.
 * ``PHWarehouse add item <Title of the Warehouse:id:quantity>``: Add an item immediately inside a created warehouse.
 * ``PHWarehouse add weapon <Title of the Warehouse:id:quantity>``: Add a weapon immediately inside a created warehouse.
 * ``PHWarehouse add armor <Title of the Warehouse:id:quantity>``: Add an armor immediately inside a created warehouse.
 * ``PHWarehouse add keyItem <Title of the Warehouse:id:quantity>``: Add a key item immediately inside a created warehouse.
+* ``PHWarehouse addRandom "CATEGORY" <Title of the Warehouse:idlist:quantity>``: Same as above where "CATEGORY" is either item, weapon, armor, or keyItem, and idlist is a list of item ids separated by the | symbol. Quantity will cause there to be at minimum 1 to a maximum of QUANTITY of that item.
 * ``PHWarehouse capacity set <Title of the Warehouse:quantity>``: Set a new maximum capacity for a warehouse already created.
 * ``PHWarehouse capacity increase <Title of the Warehouse:quantity>``: Increase the maximum capacity for a warehouse already created.
 * ``PHWarehouse capacity decrease <Title of the Warehouse:quantity>``: Decrease the maximum capacity for a warehouse already created.
@@ -84,6 +89,9 @@ The ``[commands]`` you can specify are as follow:
 * (If you don't specify the command "keyItem" in the rule, all key items will be allowed to be stored)
 
 ### ChangeLog
+* 01/13/2017: Version 1.2.1 HKRv2.1 (Fixed a bug causing there to be more loot items than intended)
+* 01/12/2017: Version 1.2.1 HKR v2 (Added randomizable id/quantity functionality)
+* 12/31/2016: Version 1.2.1red (Edited in some simple renaming functionality)
 * 05/30/2016: Version 1.2.1 (Stack items as a single space in your storage. Increase/Decrease the maximum capacity of a warehouse. Bug fixes).
 * 05/29/2016: Version 1.2 (All Together option allows you to see all the items in just one category. It also provides compatibility with ``Shaz_NoCategory`` and ``MrTS_LimitedInventory`` plugins).
 * 11/19/2015: Bug fixed in the global variable that receives the parameters. Also, a small modification in the Script commands.
